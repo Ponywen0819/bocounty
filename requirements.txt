@@ -1,0 +1,6 @@
+Flask
+mysqlclient
+flasgger
+PyMySQL
+PyJWT
+pycryptodome
