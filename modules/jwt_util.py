@@ -2,7 +2,7 @@ import jwt
 from modules.configs import Configure
 
 
-class JWT_Generater:
+class JWTGenerator:
     def __init__(self, config: Configure) -> None:
         self.secret_key = config['JWT_secret']
 

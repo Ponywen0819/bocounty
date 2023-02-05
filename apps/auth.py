@@ -1,5 +1,8 @@
 from flask import Blueprint, jsonify, current_app, make_response, request
 
+from modules.db_util import DatabaseUtils
+from Enums.FlaskConfigEnum import FlaskConfigEnum
+
 app = Blueprint('auth', __name__)
 
 
@@ -19,7 +22,7 @@ def register():
           default: None
     """
     # connect database
-    db = database_utils(current_app.config['config'])
+    db = DatabaseUtils(current_app.config[FlaskConfigEnum.AppConfig])
     # 取的是否辦過帳號了
     dbreturn = db.command_excute("""
         SELECT 
