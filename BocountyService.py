@@ -16,7 +16,7 @@ app.register_blueprint(auth.app, url_prefix='/account')
 if __name__ == "__main__":
 
     app.config[FlaskConfigEnum.AppConfig] = Configure()
-    app.config[FlaskConfigEnum.JWTGenerator] = JWTGenerator(app.config['config'])
+    app.config[FlaskConfigEnum.JWTGenerator] = JWTGenerator(app.config[FlaskConfigEnum.AppConfig])
     # app.config['crypto'] = crypto_utils(app.config['config'])
 
     app.run(host="0.0.0.0", debug=True)

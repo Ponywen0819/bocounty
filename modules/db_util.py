@@ -2,11 +2,12 @@ import json
 import pymysql
 import os
 from enum import Enum
+from Enums.FlaskConfigEnum import FlaskConfigEnum
 from modules.configs import Configure
 
 
 class DatabaseUtils:
-    def __init__(self, config: Configure):
+    def __init__(self, config: Configure, key: FlaskConfigEnum):
         self.database_host = config["SQL"]["Host"]
         self.database_User = config["SQL"]["User"]
         self.database_Password = config["SQL"]["Password"]
