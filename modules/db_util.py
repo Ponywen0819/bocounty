@@ -17,19 +17,20 @@ class DatabaseUtils:
                                     password=self.database_Password,
                                     database=self.database_Database)
 
-    def command_excute(self, command: str, param: dict = {}) -> dict:
+    def command_excute(self, command: str, param: dict) -> list:
         """
-            這個函數可以讓你使用 MySQL 的指令，並將回傳結果轉成一個 dict 回傳。
+            這個函數可以讓你使用 MySQL 的指令，並將回傳結果轉成一個 dict 回傳
+
             param:
-                command: MySQL 的指令，需要可以正常運作。
-                param: 參數化的參數。
+                - command: MySQL 的指令，需要可以正常運作
+                - param: 參數化的參數
             return:
-                一個包含結果的 dict。
+                - 一個包含結果的 dict。
         """
         with self.conn.cursor() as cursor:
             cursor.execute(command, param)
             self.conn.commit()
-            if cursor.description != None:
+            if cursor.description is not None:
                 field_name = [name[0] for name in cursor.description]
                 result = cursor.fetchall()
                 result_list = []
@@ -37,4 +38,4 @@ class DatabaseUtils:
                     result_list.append(dict(zip(field_name, list(data))))
                 return result_list
             else:
-                return {}
+                return []
