@@ -3,13 +3,17 @@ import time
 import hashlib
 from datetime import datetime
 from flask import Blueprint, jsonify, current_app, make_response, request
-from modules.module_factory import ModuleFactory
-from Enums.FlaskConfigEnum import FlaskConfigEnum
 from modules.db_util import DatabaseUtils
 
-app = Blueprint('auth', __name__)
+auth = Blueprint('auth', __name__)
 
-@app.route("/Register", methods=['POST'])
+
+@auth.route('/test')
+def test():
+
+    return 'aaa'
+
+@auth.route("/Register", methods=['POST'])
 def register():
     """
     註冊使用者並且確認Email是否重複
@@ -74,7 +78,7 @@ def register():
     return res
 
 
-@app.route("Login", methods=['POST'])
+@auth.route("Login", methods=['POST'])
 def login():
     auth_info = request.json
 
