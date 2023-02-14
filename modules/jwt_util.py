@@ -1,10 +1,11 @@
 import jwt
-from modules.configs import Configure
+from flask import Config
+from Enums.FlaskConfigEnum import FlaskConfigEnum as ConfigEnum
 
 
 class JWTGenerator:
-    def __init__(self, config: Configure) -> None:
-        self.secret_key = config['JWT_secret']
+    def __init__(self, config: Config) -> None:
+        self.secret_key = config[ConfigEnum.JWT_secret]
 
     def generate_token(self, values: dict) -> str:
         return jwt.encode(values, self.secret_key, algorithm='HS256')

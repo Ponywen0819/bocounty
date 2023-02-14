@@ -1,5 +1,7 @@
 import json
 import os
+from Enums.FlaskConfigEnum import FlaskConfigEnum as ConfigEnum
+import pickle
 
 CONFIGURENAME = './bocounty.config'
 
@@ -8,31 +10,49 @@ class Configure:
     def __init__(self) -> None:
         self.full_file_path = os.path.join(os.getcwd(), CONFIGURENAME)
         if os.path.exists(self.full_file_path):
-            with open(self.full_file_path, "r") as file:
-                self.configure = json.load(file)
+            with open(self.full_file_path, "rb") as file:
+                # self.configure = json.load(pickle.loads(file))
+                self.configure = pickle.loads(file.read())
         else:
+            # self.configure = {
+            #     'JWT_secret': 'DefaultSecret',
+            #     'SSL': {
+            #         "Enable": "false"
+            #     },
+            #     'SQL': {
+            #         'Host': '127.0.0.1',
+            #         'User': 'root',
+            #         'Password': 'Shaker8787',
+            #         'Database': 'bocounty'
+            #     },
+            #     'Encrypt': {
+            #         'PublicKeyPath': './public.pem',
+            #         'PrivateKeyPath': './private.pem'
+            #     },
+            #     'UploadFolder': "./static/picture/",
+            # }
             self.configure = {
-                'JWT_secret': 'DefaultSecret',
-                'SSL': {
+                ConfigEnum.JWT_secret: 'DefaultSecret',
+                ConfigEnum.SSL: {
                     "Enable": "false"
                 },
-                'SQL': {
+                ConfigEnum.SQL: {
                     'Host': '127.0.0.1',
                     'User': 'root',
                     'Password': 'Shaker8787',
                     'Database': 'bocounty'
                 },
-                'Encrypt': {
+                ConfigEnum.Encrypt: {
                     'PublicKeyPath': './public.pem',
                     'PrivateKeyPath': './private.pem'
                 },
-                'UploadFolder': "./static/picture/",
+                ConfigEnum.UploadFolder: "./static/picture/",
             }
             self.commit_change()
-
+        print(self.configure)
     def commit_change(self) -> None:
-        with open(self.full_file_path, "w") as file:
-            json.dump(self.configure, file)
+        with open(self.full_file_path, "wb") as file:
+            file.write(pickle.dumps(self.configure))
 
     def __str__(self) -> str:
         return str(self.configure)

@@ -1,6 +1,6 @@
-Flask
+Flask~=2.2.2
 mysqlclient
-flasgger
-PyMySQL
-PyJWT
+flasgger~=0.9.5
+PyMySQL~=1.0.2
+PyJWT~=2.6.0
 pycryptodome
