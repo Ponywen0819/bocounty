@@ -14,18 +14,25 @@ def require_login(func):
         token = request.cookies.get("User_Token")
 
         if token is None:
+            print("Token nor excite")
             return "", 301
-        if factory.JWTGenerator.check_token_valid(token):
-            return "", 301
-        user_info = factory.JWTGenerator.get_token_detail(token)
 
-        user_count = db.command_excute('''
-            SELECT COUNT(*)
+        if not factory.JWTGenerator.check_token_valid(token):
+            print("Token not valid")
+            return "", 301
+
+        token_info = factory.JWTGenerator.get_token_detail(token)
+
+        user_info = db.command_excute('''
+            SELECT *
             FROM account
             WHERE account.id = %(user_id)s
-        ''', user_info)[0]['COUNT(*)']
+        ''', token_info)
 
-        if user_count != 0:
+        if len(user_info) != 1:
             return "", 301
-        return func(*args, **kwargs)
+        return func(*args, **kwargs, user_info=user_info[0], db=db)
     return vertify
+
+
+

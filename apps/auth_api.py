@@ -11,36 +11,19 @@ from modules import module_factory
 
 auth = Blueprint('auth', __name__)
 
-@auth.route('/test')
-def test():
-    factory: module_factory.ModuleFactory = current_app.config[ConfigEnum.Factory]
-    pub = factory.Crypto.get_pubkey()
-
-    db = DatabaseUtils(current_app.config)
-    # 取的是否辦過帳號了
-    user_count = db.command_excute("""
-            SELECT COUNT(*) 
-            FROM account 
-    """, {})
-
-    print(user_count)
-    return pub
-
 
 @auth.route("/Register", methods=['POST'])
 def register():
     """
     註冊使用者並且確認Email是否重複
         tags:
-            - Login
+            - Register
         produces:
             - application/json
         parameters:
-            - name: account_id
-            - in: body
-            - type: string
-            - required: true
-            - default: None
+            - name: str
+            - email: str
+            - password: str
     """
     # 初始化必要工具
     db = DatabaseUtils(current_app.config)
@@ -55,18 +38,18 @@ def register():
 
     if user_count != 0:
         return jsonify({
-            'cause': 151
+            'cause': 101
         })
 
-    # 確認註冊資料格式 ??
+    # 確認註冊資料格式
     if len(request.json['password']) < 6:
         return jsonify({
-            'cause': 152
+            'cause': 102
         })
     require_field = ["name", "email", "password"]
     for need in require_field:
         if need not in request.json.keys():
-            return jsonify({"cause": 153})
+            return jsonify({"cause": 102})
 
     account_info = request.json
     account_info['password'] = hashlib.sha256(
@@ -93,6 +76,16 @@ def register():
 
 @auth.route("Login", methods=['POST'])
 def login():
+    """
+        用於驗證使用者登入資訊，並發放token
+
+        :parameter:
+            - name: str
+            - email: str
+            - password: str
+        :return:
+            - application/json
+    """
     factory = current_app.config[ConfigEnum.Factory]
     db = DatabaseUtils(current_app.config)
 
