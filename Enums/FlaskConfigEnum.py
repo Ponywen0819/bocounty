@@ -13,5 +13,5 @@ class FlaskConfigEnum(Enum):
     SQL = 6
     Encrypt = 7
     UploadFolder = 8
-
+    Factory = 9
 

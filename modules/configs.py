@@ -11,7 +11,6 @@ class Configure:
         self.full_file_path = os.path.join(os.getcwd(), CONFIGURENAME)
         if os.path.exists(self.full_file_path):
             with open(self.full_file_path, "rb") as file:
-                # self.configure = json.load(pickle.loads(file))
                 self.configure = pickle.loads(file.read())
         else:
             # self.configure = {
@@ -39,7 +38,7 @@ class Configure:
                 ConfigEnum.SQL: {
                     'Host': '127.0.0.1',
                     'User': 'root',
-                    'Password': 'Shaker8787',
+                    'Password': '12345678',
                     'Database': 'bocounty'
                 },
                 ConfigEnum.Encrypt: {
@@ -49,7 +48,6 @@ class Configure:
                 ConfigEnum.UploadFolder: "./static/picture/",
             }
             self.commit_change()
-        print(self.configure)
     def commit_change(self) -> None:
         with open(self.full_file_path, "wb") as file:
             file.write(pickle.dumps(self.configure))
