@@ -1,0 +1,15 @@
+{
+  "scripts": {
+    "bable": "babel --watch ./src/jsx --out-dir ./src/js --presets react-app/prod",
+    "tailwindcss": "tailwindcss -i ./static/css/input.css -o ./static/css/output.css --watch"
+  },
+  "dependencies": {
+    "autoprefixer": "^10.4.13",
+    "babel-cli": "^6.26.0",
+    "babel-preset-react-app": "^3.1.2",
+    "postcss": "^8.4.20"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.2.4"
+  }
+}

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/static/img/logo1.png" type="image/x-icon"/>
+    <link rel="stylesheet" href="/static/css/output.css">
+    {% for j in setting.css %}
+        <link rel="stylesheet" href="/static/css/{{ j }}">
+    {% endfor %}
+    <title>{{ setting.title }}</title>
+</head>
+<body style="background-color: #f5f5f5">
+    <div id="main" style="min-width: 1000px; min-height: 100vh"></div>
+
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/node-forge@1.0.0/dist/forge.min.js"></script>
+    {% for i in setting.script %}
+        <script src="/static/js/{{ i }}"></script>
+    {% endfor%}
+</body>
+</html>

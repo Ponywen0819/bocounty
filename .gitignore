@@ -1,10 +1,21 @@
 
 .idea/
 
-apps/__pycache__/
+python/apps/__pycache__/
 
-Enums/__pycache__/
+python/Enums/__pycache__/
 
-modules/__pycache__/
+python/modules/__pycache__/
 
 bocounty.config
+
+node_modules/
+
+venv/
+
+
+__pycache__/BocountyService.cpython-39.pyc
+
+.DS_Store
+
+__pycache__/
