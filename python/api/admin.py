@@ -4,7 +4,7 @@ from flask import Blueprint, request, jsonify
 from utils.auth_util import require_admin
 from database import db
 from models import Pool, Item, PoolItem
-from utils.storage_util import StorgeCode, storage_photo
+from utils.storage_util import StorgeCode, storage_photo, storage_delete
 
 
 admin_api = Blueprint('admin_api', __name__)
@@ -117,4 +117,45 @@ def create_item(*args, **kwargs):
 @admin_api.route('/deleteItem', methods=['POST'])
 @require_admin
 def del_item(*args, **kwargs):
-    pass
+    item: Item = Item.query.filter(
+        Pool.id == request.json['id']
+    ).first()
+
+    if item is None:
+        return_code = 104
+    else:
+        db.session.delete(item)
+        db.session.commit()
+        return_code = 0
+    return jsonify({
+        "status": return_code
+    })
+
+
+@admin_api.route('/modifyItemInfo', methods=['POST'])
+@require_admin
+def modify_item_info(*args, **kwargs):
+    req_json: dict = request.json
+    item = Item.query.filter(
+        Item.id == req_json['id']
+    ).first()
+
+    if item is None:
+        return '', 406
+
+    keys = req_json.keys()
+    if 'name' in keys:
+        item.name = req_json['name']
+    if 'type' in keys:
+        item.type = req_json['type']
+    if 'photo' in keys:
+        old_path = item.photo[5:]
+        storage_delete(old_path, StorgeCode.ITEM)
+        new_path = storage_photo(req_json['photo'], StorgeCode.ITEM)
+        if new_path is None:
+            return '', 406
+        item.photo = new_path
+    db.session.commit()
+    return jsonify({
+        'status': 0
+    })

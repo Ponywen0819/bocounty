@@ -48,5 +48,5 @@ def create_app(config_filename=None):
     @app.route('/test')
     def test():
         print(os.path.abspath('../'))
-        return app.config['STORAGE_PATH'],200
+        return app.config['STORAGE_PATH'], 200
     return app

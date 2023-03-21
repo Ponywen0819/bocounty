@@ -11,5 +11,7 @@ venv/
 
 .DS_Store
 
-/storage
+/storage/item
+
+/storage/pool
 
