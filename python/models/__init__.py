@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer, ForeignKey
+from sqlalchemy import Column, String, Integer, ForeignKey, DATETIME
 from database import db
 
 
@@ -38,9 +38,9 @@ class Order(db.Model):
     title = Column(String, nullable=False)
     intro = Column(String, nullable=False)
     price = Column(Integer, nullable=False)
-    start_time = Column(String, nullable=False)
-    close_time = Column(String, nullable=False)
-    exec_time = Column(String, nullable=False)
+    start_time = Column(DATETIME, nullable=False)
+    close_time = Column(DATETIME, nullable=False)
+    exec_time = Column(DATETIME, nullable=False)
     owner_id = Column(ForeignKey(Account.id, ondelete="CASCADE"))
 
 
@@ -55,7 +55,7 @@ class Message(db.Model):
     chatroom_id = Column(ForeignKey(Involve.chatroom_id), nullable=False)
     sender_id = Column(ForeignKey(Account.id), nullable=False)
     content = Column(String, nullable=False)
-    time = Column(String, nullable=False)
+    time = Column(DATETIME, nullable=False)
 
 
 class Pool(db.Model):

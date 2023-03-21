@@ -9,7 +9,7 @@ def require_login(func):
     def verify(*args, **kwargs):
         token_info = _get_token_detail()
         if token_info is None:
-            return '', 401
+            return '操', 401
         user: Account = Account.query.filter(
             Account.id == token_info['user_id']
         ).first()

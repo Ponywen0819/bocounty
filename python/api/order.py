@@ -1,5 +1,6 @@
-from flask import Blueprint
+from flask import Blueprint, request
 from utils.auth_util import require_login
+from utils.order_util import verify_create_form
 
 order_api = Blueprint("order_api", __name__)
 
@@ -23,8 +24,11 @@ def change_order_state(*args, **kwargs):
 
 
 @order_api.route('/createOrder', methods=['POST'])
+@require_login
+@verify_create_form
 def create_order():
-    pass
+    req_json: dict = request.json
+
 
 
 @order_api.route('/deleteOrder', methods=['POST'])
