@@ -18,7 +18,7 @@ auth_api = Blueprint('auth_api', __name__)
 @auth_api.route("/Register", methods=['POST'])
 def register():
     """
-    註冊使用者並且確認Email是否重複
+        註冊使用者並且確認Email是否重複
         tags:
             - Register
         produces:
@@ -28,20 +28,20 @@ def register():
             - email: str
             - password: str
     """
+    require_field = ["student_id", "name", "password"]
+    for need in require_field:
+        if need not in request.json.keys():
+            return jsonify({"cause": 102})
+
     # 確認帳號使否重複
     user_count = Account.query.filter(
-        Account.student_id == request.json["school_id"]
+        Account.student_id == request.json["student_id"]
     ).count()
 
     if user_count != 0:
         return jsonify({
             'cause': 101
         })
-
-    require_field = ["school_id", "name", "password"]
-    for need in require_field:
-        if need not in request.json.keys():
-            return jsonify({"cause": 102})
 
     account_info = request.json
     account_info['password'] = hashlib.sha256(request.json['password'].encode("utf-8")).hexdigest()
@@ -51,17 +51,11 @@ def register():
 
     new_account = Account(
         id=new_id,
-        student_id=account_info['school_id'],
+        student_id=account_info['student_id'],
         name=account_info['name'],
         password=account_info['password']
     )
     db.session.add(new_account)
-
-    # 插入帳號外觀紀錄
-    new_picked = PickedItem(
-        user_id=new_id
-    )
-    db.session.add(new_picked)
     db.session.commit()
 
     # token = factory.JWTGenerator.generate_token({"user_id": new_id})

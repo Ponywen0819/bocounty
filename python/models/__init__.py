@@ -9,6 +9,7 @@ class Account(db.Model):
     password = Column(String, nullable=False)
     bocoin = Column(Integer, nullable=False, default=0)
     intro = Column(String, nullable=False, default='')
+    mail_verify = Column(String, nullable=False, default=0)
     permission = Column(Integer, nullable=False, default=0)
 
 
@@ -27,10 +28,8 @@ class OwnItem(db.Model):
 
 class PickedItem(db.Model):
     user_id = Column(ForeignKey(Account.id), nullable=False, primary_key=True)
-    face_id = Column(ForeignKey(Item.id), nullable=False, default='None')
-    hair_id = Column(ForeignKey(Item.id), nullable=False, default='None')
-    clothe_id = Column(ForeignKey(Item.id), nullable=False, default='None')
-    item_id = Column(ForeignKey(Item.id), nullable=False, default='None')
+    item_id = Column(ForeignKey(Item.id), nullable=False)
+    type = Column(Integer, nullable=False)
 
 
 class Order(db.Model):
@@ -40,6 +39,8 @@ class Order(db.Model):
     intro = Column(String, nullable=False)
     price = Column(Integer, nullable=False)
     start_time = Column(String, nullable=False)
+    close_time = Column(String, nullable=False)
+    exec_time = Column(String, nullable=False)
     owner_id = Column(ForeignKey(Account.id, ondelete="CASCADE"))
 
 
@@ -60,6 +61,7 @@ class Message(db.Model):
 class Pool(db.Model):
     id = Column(String, primary_key=True, nullable=False)
     name = Column(String, nullable=False)
+    photo = Column(String, nullable=False)
 
 
 class PoolItem(db.Model):

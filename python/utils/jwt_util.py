@@ -1,7 +1,6 @@
 import jwt
 import secrets
 from flask import Config
-from Enums.FlaskConfigEnum import FlaskConfigEnum as ConfigEnum
 
 
 class JWTGenerator:
