@@ -1,5 +1,3 @@
-# API要求
-
 ## 驗證API
 
 - [x]  Login
@@ -84,6 +82,27 @@
             
             該使用者的簡介
             
+- [x]  checkUserVerify
+    
+    描述：確認使用者郵件認證狀態
+    
+    - 輸入
+        
+        無需輸入
+        
+    - 回應
+        - status: int
+            
+            表示API要求的狀態。
+            
+        - verify: int
+            
+            表示認證狀態
+            
+            | 代碼 | 認證狀態 |
+            | --- | --- |
+            | 0 | 尚未認證 |
+            | 1 | 已完成認證 |
 - [ ]  getUserOutlook
     
     描述：取得使用者外觀設定
@@ -147,7 +166,7 @@
                 
                 配件名稱
                 
-- [ ]  getUserCoin
+- [x]  getUserCoin
     
     描述：取得使用者擁有之硬幣數量
     
@@ -164,7 +183,7 @@
             
             持有多少硬幣
             
-- [ ]  changeUserInfo
+- [x]  changeUserInfo
     
     描述：上傳變更後的使用者名稱或簡介
     
@@ -259,10 +278,6 @@
     描述：依條件取得委託列表
     
     - 輸入
-        - id: str
-            
-            委託編號
-            
         - type: int
             
             取出委託列表的種類
@@ -293,6 +308,14 @@
             - title: str
                 
                 此委託的標題
+                
+            
+            ```json
+            {
+            	"status": 1,  //int
+            	"title": "qwe" //str
+            }
+            ```
             
 - [ ]  getOrderInfo
     
@@ -337,7 +360,7 @@
             
             委託人的編號
             
-- [ ]  changeOrderState
+- [ ]  pushOrderState
     
     描述：給定編號使該委託進入下一階段
     
@@ -366,7 +389,34 @@
     
     - 輸入
         - title: str
-        - time: str
+            
+            此委託的標題
+            
+        - close_time: str
+            
+            此委託的招募期限
+            
+        - exec_time: str
+            
+            此委託的執行時間
+            
+        - price: int
+            
+            此委託的酬勞
+            
+        - intro: str
+            
+            此委託的介紹內容
+            
+    - 回應
+        - status: int
+            
+            表示API要求的狀態。
+            
+        - id: str
+            
+            新委託的編號
+            
 - [ ]  deleteOrder
     
     描述：刪除委託
@@ -381,8 +431,6 @@
             
             表示API要求的狀態。
             
-
-表示API要求的狀態。
 
 ## 訊息操作API
 
@@ -470,20 +518,62 @@
 
 ## 管理員API
 
-- [ ]  createPool
+- [x]  listPool
     
-    描述：創建新的抽卡池
+    描述：取出卡池列表
     
     - 輸入
         
-        無需輸入
+        不需要輸入
         
     - 回應
         - status: int
             
             表示API要求的狀態。
             
-- [ ]  deletePool
+        - pool_list: list[obj]
+            
+            卡池資料集合
+            
+            - id: str
+                
+                卡池編號
+                
+            - num: int
+                
+                卡池內容物數量
+                
+            - name: str
+                
+                卡池名稱
+                
+            - photo: str
+                
+                卡池圖片路徑
+                
+- [x]  createPool
+    
+    描述：創建新的抽卡池
+    
+    - 輸入
+        - name: str
+            
+            卡池名稱
+            
+        - photo: str
+            
+            圖片資料，使用base64轉換成字串
+            
+    - 回應
+        - status: int
+            
+            表示API要求的狀態
+            
+        - pool_id:
+            
+            新建卡池編號
+            
+- [x]  deletePool
     
     描述：刪除抽卡池
     
@@ -506,7 +596,7 @@
             
             卡池編號
             
-        - modify_list: list[obj]
+        - modify_list: list[str]
             
             更改後的物品編號列表
             
@@ -515,7 +605,7 @@
             
             表示API要求的狀態。
             
-- [ ]  listItem
+- [x]  listItem
     
     描述：列出系統內發行的道具
     
@@ -544,7 +634,11 @@
                 
                 此配件圖片路徑
                 
-- [ ]  createItem
+            - type: int
+                
+                配件的種類
+                
+- [x]  createItem
     
     描述：新增物品
     
@@ -570,7 +664,7 @@
             
             新增加道具的編號。
             
-- [ ]  deleteItem
+- [x]  deleteItem
     
     描述：刪除物品
     
@@ -578,6 +672,33 @@
         - id: str
             
             此配件的編號
+            
+    - 回應
+        - status: int
+            
+            表示API要求的狀態。
+            
+        
+- [x]  modifyItemInfo
+    
+    描述：更改配件資訊
+    
+    - 輸入
+        - id: str
+            
+            更改配件的編號
+            
+        - name: str
+            
+            選填，更改後的名稱
+            
+        - photo: str
+            
+            選填，更改後的照片資料，以base64編碼
+            
+        - type: int
+            
+            選填，更改後的配件類型
             
     - 回應
         - status: int
