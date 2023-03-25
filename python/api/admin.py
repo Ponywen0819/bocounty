@@ -1,7 +1,7 @@
 import uuid
 from sqlalchemy import func
 from flask import Blueprint, request, jsonify
-from utils.auth_util import require_admin
+from utils.auth_util import login_required
 from database import db
 from models import Pool, Item, PoolItem
 from utils.storage_util import StorgeCode, storage_photo, storage_delete
@@ -11,7 +11,7 @@ admin_api = Blueprint('admin_api', __name__)
 
 
 @admin_api.route('/listPool', methods=['GET'])
-@require_admin
+@login_required
 def list_pool(*args, **kwargs):
     pools_and_counts = db.session.query(Pool.id, Pool.name, Pool.photo, func.count(Item.id)).\
         join(PoolItem, PoolItem.pool_id == Pool.id, isouter=True).\
@@ -28,7 +28,7 @@ def list_pool(*args, **kwargs):
 
 
 @admin_api.route('/createPool', methods=['POST'])
-@require_admin
+@login_required
 def create_pool(*args, **kwargs):
     req_json: dict = request.json
 
@@ -53,7 +53,7 @@ def create_pool(*args, **kwargs):
 
 
 @admin_api.route('/deletePool', methods=['POST'])
-@require_admin
+@login_required
 def delete_pool(*args, **kwargs):
     pool: Pool = Pool.query.filter(
         Pool.id == request.json['id']
@@ -71,13 +71,13 @@ def delete_pool(*args, **kwargs):
 
 
 @admin_api.route('/modifyPoolItem', methods=['POST'])
-@require_admin
+@login_required
 def modify_pool_item(*args, **kwargs):
     pass
 
 
 @admin_api.route('/listItem', methods=['GET'])
-@require_admin
+@login_required
 def list_item(*args, **kwargs):
     item_row = db.session.query(Item.id, Item.name, Item.photo, Item.type)
     item_list = [
@@ -91,7 +91,7 @@ def list_item(*args, **kwargs):
 
 
 @admin_api.route('/createItem', methods=['POST'])
-@require_admin
+@login_required
 def create_item(*args, **kwargs):
     req_json: dict = request.json
 
@@ -115,7 +115,7 @@ def create_item(*args, **kwargs):
 
 
 @admin_api.route('/deleteItem', methods=['POST'])
-@require_admin
+@login_required
 def del_item(*args, **kwargs):
     item: Item = Item.query.filter(
         Pool.id == request.json['id']
@@ -133,7 +133,7 @@ def del_item(*args, **kwargs):
 
 
 @admin_api.route('/modifyItemInfo', methods=['POST'])
-@require_admin
+@login_required
 def modify_item_info(*args, **kwargs):
     req_json: dict = request.json
     item = Item.query.filter(

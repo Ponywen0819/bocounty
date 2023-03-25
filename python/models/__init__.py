@@ -34,13 +34,13 @@ class PickedItem(db.Model):
 
 class Order(db.Model):
     id = Column(String, primary_key=True, nullable=False)
-    status = Column(Integer, nullable=False)
+    status = Column(Integer, nullable=False, default=0)
     title = Column(String, nullable=False)
     intro = Column(String, nullable=False)
     price = Column(Integer, nullable=False)
-    start_time = Column(DATETIME, nullable=False)
-    close_time = Column(DATETIME, nullable=False)
-    exec_time = Column(DATETIME, nullable=False)
+    start_time = Column(String, nullable=False)
+    close_time = Column(String, nullable=False)
+    exec_time = Column(String, nullable=False)
     owner_id = Column(ForeignKey(Account.id, ondelete="CASCADE"))
 
 

@@ -4,7 +4,6 @@ from datetime import datetime, timedelta
 import hashlib
 import uuid
 from utils.jwt_util import JWTGenerator
-from utils.auth_util import require_login
 
 from flask import Blueprint, jsonify, make_response, Response, request, current_app
 

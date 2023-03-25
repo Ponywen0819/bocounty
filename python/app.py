@@ -38,10 +38,10 @@ def create_app(config_filename=None):
 
     app.register_blueprint(auth_api)
     app.register_blueprint(account_api)
-    app.register_blueprint(message_api)
-    app.register_blueprint(admin_api)
-    app.register_blueprint(order_api)
-    app.register_blueprint(item_api)
+    # app.register_blueprint(message_api)
+    # app.register_blueprint(admin_api)
+    # app.register_blueprint(order_api)
+    # app.register_blueprint(item_api)
 
     from models import Pool, Item, PoolItem
     from sqlalchemy import func

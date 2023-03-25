@@ -1,61 +1,45 @@
-from flask import current_app, request
+from flask import current_app, request, abort, jsonify
 from utils.jwt_util import JWTGenerator
+from utils.respons_util import make_error_response
+from utils.enum_util import APIStatusCode
 from models import Account
 from functools import wraps
 
 
-def require_login(func):
+def verify_jwt(func):
     @wraps(func)
-    def verify(*args, **kwargs):
-        token_info = _get_token_detail()
-        if token_info is None:
-            return '操', 401
-        user: Account = Account.query.filter(
-            Account.id == token_info['user_id']
-        ).first()
-
-        if user is not None:
-            return func(*args, **kwargs, user=user)
+    def wrap(*args, **kwargs):
+        if get_token_detail() is None:
+            return 'require login', 401
         else:
-            return "", 401
-    return verify
+            return func(*args, **kwargs)
+    return wrap
 
 
-def require_admin(func):
+def login_required(func):
     @wraps(func)
-    def verify(*args, **kwargs):
-        token_info = _get_token_detail()
+    def wrapper(*args, **kwargs):
+        token_info = get_token_detail()
         if token_info is None:
-            return '', 401
-        user: Account = Account.query.filter(
-            Account.id == token_info['user_id']
-        ).first()
+            return make_error_response(APIStatusCode.NotLogin, reason='user has not token')
 
+        user: Account = get_user_by_id(token_info['user_id'])
         if user is None:
-            return "", 401
-        elif user.permission != 1:
-            return "", 401
-        else:
-            return func(*args, **kwargs, user=user)
-    return verify
+            return make_error_response(APIStatusCode.NotLogin, reason='user not found')
+
+        return func(*args, **kwargs)
+    return wrapper
 
 
-def require_vertify(func):
-    @wraps(func)
-    def vertify(*args, **kwargs):
-        token_info = _get_token_detail()
-        user: Account = Account.query.filter(
-            Account.id == token_info['user_id']
-        ).first()
+def get_user_by_id(user_id: str) -> Account:
+    user: Account = Account.query.filter(
+        Account.id == user_id
+    ).first()
 
-        if user.mail_verify == 1:
-            return func(*args, **kwargs, user=user)
-        else:
-            return "", 401
-    return vertify
+    return user
 
 
-def _get_token_detail():
+def get_token_detail():
     jwt_gen: JWTGenerator = current_app.config['jwt_gen']
     token = request.cookies.get("User_Token")
 
@@ -68,3 +52,4 @@ def _get_token_detail():
         return None
 
     return jwt_gen.get_token_detail(token)
+
