@@ -1,7 +1,9 @@
+from flask import Blueprint, request, jsonify, current_app
 import uuid
 from sqlalchemy import func
-from flask import Blueprint, request, jsonify
-from utils.auth_util import login_required
+from utils.auth_util import admin_required
+from utils.respons_util import make_error_response
+from utils.enum_util import APIStatusCode
 from database import db
 from models import Pool, Item, PoolItem
 from utils.storage_util import StorgeCode, storage_photo, storage_delete
@@ -11,7 +13,7 @@ admin_api = Blueprint('admin_api', __name__)
 
 
 @admin_api.route('/listPool', methods=['GET'])
-@login_required
+@admin_required
 def list_pool(*args, **kwargs):
     pools_and_counts = db.session.query(Pool.id, Pool.name, Pool.photo, func.count(Item.id)).\
         join(PoolItem, PoolItem.pool_id == Pool.id, isouter=True).\
@@ -28,7 +30,7 @@ def list_pool(*args, **kwargs):
 
 
 @admin_api.route('/createPool', methods=['POST'])
-@login_required
+@admin_required
 def create_pool(*args, **kwargs):
     req_json: dict = request.json
 
@@ -37,7 +39,7 @@ def create_pool(*args, **kwargs):
     new_pool_photo_path = storage_photo(req_json['photo'], StorgeCode.POOL)
 
     if new_pool_photo_path is None:
-        return '', 406
+        return make_error_response(APIStatusCode.Wrong_Format, reason='the format of photo data is not correct')
 
     new_pool = Pool(
         id=new_pool_id,
@@ -53,31 +55,30 @@ def create_pool(*args, **kwargs):
 
 
 @admin_api.route('/deletePool', methods=['POST'])
-@login_required
+@admin_required
 def delete_pool(*args, **kwargs):
     pool: Pool = Pool.query.filter(
         Pool.id == request.json['id']
     ).first()
 
     if pool is None:
-        return_code = 104
+        return make_error_response(APIStatusCode.RequireMissmatch, reason="pool isn't exist")
     else:
         db.session.delete(pool)
         db.session.commit()
-        return_code = 0
-    return jsonify({
-        "status": return_code
-    })
+        return jsonify({
+            "status": 0
+        })
 
 
 @admin_api.route('/modifyPoolItem', methods=['POST'])
-@login_required
+@admin_required
 def modify_pool_item(*args, **kwargs):
     pass
 
 
 @admin_api.route('/listItem', methods=['GET'])
-@login_required
+@admin_required
 def list_item(*args, **kwargs):
     item_row = db.session.query(Item.id, Item.name, Item.photo, Item.type)
     item_list = [
@@ -91,7 +92,7 @@ def list_item(*args, **kwargs):
 
 
 @admin_api.route('/createItem', methods=['POST'])
-@login_required
+@admin_required
 def create_item(*args, **kwargs):
     req_json: dict = request.json
 
@@ -115,7 +116,7 @@ def create_item(*args, **kwargs):
 
 
 @admin_api.route('/deleteItem', methods=['POST'])
-@login_required
+@admin_required
 def del_item(*args, **kwargs):
     item: Item = Item.query.filter(
         Pool.id == request.json['id']
@@ -133,7 +134,7 @@ def del_item(*args, **kwargs):
 
 
 @admin_api.route('/modifyItemInfo', methods=['POST'])
-@login_required
+@admin_required
 def modify_item_info(*args, **kwargs):
     req_json: dict = request.json
     item = Item.query.filter(

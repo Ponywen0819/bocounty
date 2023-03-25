@@ -1,7 +1,7 @@
 from flask import Blueprint, current_app, request, jsonify
 from models import Account, Item, OwnItem, PickedItem
 from database import db
-from utils.auth_util import login_required, get_token_detail, get_user_by_id
+from utils.auth_util import login_required, get_user_by_token
 from utils.enum_util import APIStatusCode
 from utils.respons_util import make_error_response
 
@@ -14,11 +14,12 @@ account_api = Blueprint("acc_api", __name__)
 def get_user_info(*args, **kwargs):
     if 'id' in request.json.keys():
         require_id = request.json['id']
+        user: Account = Account.query.filter(
+            Account.id == require_id
+        ).first()
     else:
-        token_info = get_token_detail()
-        require_id = token_info['user_id']
+        user: Account = get_user_by_token()
 
-    user: Account = get_user_by_id(require_id)
     if user is None:
         return make_error_response(APIStatusCode.RequireMissmatch, reason="user isn't exist")
     return jsonify({
@@ -33,8 +34,7 @@ def get_user_info(*args, **kwargs):
 @account_api.route('/checkUserVerify', methods=['GET'])
 @login_required
 def check_user_verify(*args, **kwargs):
-    token_info = get_token_detail()
-    user: Account = get_user_by_id(token_info['user_id'])
+    user: Account = get_user_by_token()
     if user is None:
         return make_error_response(APIStatusCode.NotLogin, reason='require login')
 
@@ -49,8 +49,7 @@ def check_user_verify(*args, **kwargs):
 @account_api.route('/getUserItem', methods=['GET'])
 @login_required
 def get_user_item(*args, **kwargs):
-    token_info = get_token_detail()
-    user: Account = get_user_by_id(token_info['user_id'])
+    user: Account = get_user_by_token()
 
     item_list = Item.query.\
         join(OwnItem, OwnItem.item_id == Item.id).\
@@ -66,8 +65,7 @@ def get_user_item(*args, **kwargs):
 @account_api.route('/getUserOutlook', methods=['GET'])
 @login_required
 def get_user_outlook(*args, **kwargs):
-    token_info = get_token_detail()
-    user: Account = get_user_by_id(token_info['user_id'])
+    user: Account = get_user_by_token()
 
     item_list, equ_types = db.session.query(Item, PickedItem.type).\
         join(PickedItem, Item.id == PickedItem.item_id).\
@@ -84,8 +82,7 @@ def get_user_outlook(*args, **kwargs):
 @account_api.route('/getUserCoin', methods=['GET'])
 @login_required
 def get_user_coin(*args, **kwargs):
-    token_info = get_token_detail()
-    user: Account = get_user_by_id(token_info['user_id'])
+    user: Account = get_user_by_token()
 
     return jsonify({
         'status': 0,
@@ -96,8 +93,7 @@ def get_user_coin(*args, **kwargs):
 @account_api.route('/changeUserInfo', methods=['POST'])
 @login_required
 def change_user_info(*args, **kwargs):
-    token_info = get_token_detail()
-    user: Account = get_user_by_id(token_info['user_id'])
+    user: Account = get_user_by_token()
 
     req_json: dict = request.json
     if 'name' in req_json.keys():
