@@ -1,10 +1,8 @@
+import React from "react";
+import Reactdom from "react-dom";
 
 
-const Home = () =>{
-    return(
-        <div>
-            <p>我槽</p>
-        </div>
-    )
+export default function Home(){
+    return(<div><p>qweqweq</p></div>);
 }
 

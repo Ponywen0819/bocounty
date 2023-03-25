@@ -17,3 +17,5 @@ venv/
 
 
 bocountry.sqlite
+
+package-lock.json

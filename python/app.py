@@ -2,7 +2,7 @@ import os
 import secrets
 import uuid
 from utils.jwt_util import JWTGenerator
-from flask import Flask
+from flask import Flask, render_template, redirect
 from api.auth import auth_api
 from api.account import account_api
 from api.admin import admin_api
@@ -14,7 +14,7 @@ from models import Account, PickedItem, Item
 
 
 def create_app(config_filename=None):
-    app = Flask(__name__)
+    app = Flask(__name__, template_folder='../template', static_folder='../src')
     if config_filename is None:
         app.config.from_pyfile('config.py')
     else:
@@ -47,15 +47,14 @@ def create_app(config_filename=None):
     from models import Order, Involve
     from sqlalchemy import func
     from utils.enum_util import OrderListCode
-    @app.route('/test')
-    def test():
-        involve_query = db.session.query(Involve.order_id).filter(
-            Involve.involver_id != 'qwe'
-        ).subquery()
-        order_list = Order.query. \
-            join(Involve, Involve.order_id == Order.id). \
-            filter(Involve.involver_id != 'qwe', Order.owner_id != 'qwe')
 
-        print(order_list)
-        return app.config['STORAGE_PATH'], 200
+    @app.route('/')
+    def to_admin_page():
+        return redirect('/test')
+    @app.route('/test')
+    def admin_page():
+        setting = {
+            "title": '管業員頁面',
+        }
+        return render_template('main.html', setting=setting)
     return app
