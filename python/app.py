@@ -25,17 +25,7 @@ def create_app(config_filename=None):
     db.init_app(app)
 
     with app.app_context():
-        create_db(flush=True)
-        admin_id = uuid.uuid4().hex
-        db.session.add(Account(
-            id=admin_id,
-            student_id='123456789',
-            name='預設管理員',
-            password='8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918',  # admin
-            permission=1,
-            bocoin=100
-        ))
-        db.session.commit()
+        create_db(flush=False)
 
     app.register_blueprint(auth_api)
     app.register_blueprint(account_api)
@@ -51,8 +41,10 @@ def create_app(config_filename=None):
     @app.route('/')
     def to_admin_page():
         return redirect('/test')
+
+    @app.route('/test/<path>')
     @app.route('/test')
-    def admin_page():
+    def admin_page(path=None):
         setting = {
             "title": '管業員頁面',
         }

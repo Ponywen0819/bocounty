@@ -2,12 +2,11 @@ from flask import Blueprint, request, jsonify, current_app
 import uuid
 from sqlalchemy import func
 from utils.auth_util import admin_required
+from utils.storage_util import StorgeCode, storage_photo, storage_delete
 from utils.respons_util import make_error_response
-from utils.enum_util import APIStatusCode
+from utils.enum_util import APIStatusCode, ModifyAction
 from database import db
 from models import Pool, Item, PoolItem
-from utils.storage_util import StorgeCode, storage_photo, storage_delete
-
 
 admin_api = Blueprint('admin_api', __name__)
 
@@ -15,9 +14,9 @@ admin_api = Blueprint('admin_api', __name__)
 @admin_api.route('/listPool', methods=['GET'])
 @admin_required
 def list_pool(*args, **kwargs):
-    pools_and_counts = db.session.query(Pool.id, Pool.name, Pool.photo, func.count(Item.id)).\
-        join(PoolItem, PoolItem.pool_id == Pool.id, isouter=True).\
-        join(Item, Item.id == PoolItem.item_id, isouter=True).\
+    pools_and_counts = db.session.query(Pool.id, Pool.name, Pool.photo, func.count(Item.id)). \
+        join(PoolItem, PoolItem.pool_id == Pool.id, isouter=True). \
+        join(Item, Item.id == PoolItem.item_id, isouter=True). \
         group_by(Pool.id).all()
     pools_info = [
         dict(zip(['id', 'name', 'photo', 'num'], row))
@@ -74,7 +73,53 @@ def delete_pool(*args, **kwargs):
 @admin_api.route('/modifyPoolItem', methods=['POST'])
 @admin_required
 def modify_pool_item(*args, **kwargs):
-    pass
+    request_json: dict = request.json
+
+    modify_items = request_json['modify_list']
+    pool_id = request_json['id']
+
+    check_pool: int = Pool.query.filter(
+        Pool.id == request_json['id']
+    ).count()
+
+    if check_pool == 0:
+        return make_error_response(APIStatusCode.InstanceNotExist, reason='Pool %d not exist' % pool_id)
+
+    # db.session.begin()
+    for info in modify_items:
+        print(info)
+        check_item: int = Item.query.filter(
+            Item.id == info['id']
+        ).count()
+
+        if check_item == 0:
+            return make_error_response(APIStatusCode.InstanceNotExist,
+                                       reason='Item %d not exist!' % request_json['id'])
+
+        if ModifyAction(info['action']) == ModifyAction.Add:
+
+            check_exist: int = PoolItem.query.filter(
+                PoolItem.pool_id == pool_id,
+                PoolItem.item_id == info['id']
+            ).count()
+
+            if check_exist == 0:
+                db.session.add(PoolItem(
+                    pool_id=pool_id,
+                    item_id=info['id']
+                ))
+        else:
+            del_pool_item: PoolItem = PoolItem.query.filter(
+                PoolItem.pool_id == pool_id,
+                PoolItem.item_id == info['id']
+            ).first()
+
+            if del_pool_item is not None:
+                db.session.delete(del_pool_item)
+    db.session.commit()
+    return jsonify({
+        "status": 0
+    })
 
 
 @admin_api.route('/listItem', methods=['GET'])

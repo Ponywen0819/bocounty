@@ -42,7 +42,8 @@ def admin_required(func):
 
         user: Account = Account.query.filter(
             Account.id == token_info['user_id']
-        )
+        ).first()
+
         if user is None:
             return make_error_response(APIStatusCode.NotLogin, reason='user not found')
 

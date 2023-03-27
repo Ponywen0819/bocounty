@@ -4,7 +4,7 @@ from database import db
 
 class Account(db.Model):
     id = Column(String, primary_key=True, nullable=False)
-    student_id = Column(String, nullable=False)
+    student_id = Column(String, nullable=False, unique=True)
     name = Column(String, nullable=False)
     password = Column(String, nullable=False)
     bocoin = Column(Integer, nullable=False, default=0)

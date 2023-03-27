@@ -12,5 +12,5 @@ def get_pool_list(*args, **kwargs):
 
 @item_api.route('/drawCards', methods=['POST'])
 @login_required
-def drae_cards(*args, **kwargs):
+def draw_cards(*args, **kwargs):
     pass

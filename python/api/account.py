@@ -9,7 +9,7 @@ account_api = Blueprint("acc_api", __name__)
 
 
 # @account_api.route('/getUserInfo/<id>', methods=['GET'])
-@account_api.route('/getUserInfo', methods=['GET'])
+@account_api.route('/getUserInfo', methods=['POST'])
 @login_required
 def get_user_info(*args, **kwargs):
     if 'id' in request.json.keys():

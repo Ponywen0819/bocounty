@@ -51,6 +51,7 @@ class ListOrderPayload:
         if (self.type < 0) or (self.type > 3):
             raise TypeError
 
+
 def verify_create_form(func):
     @wraps(func)
     def wrap(*args, **kwargs):
@@ -63,6 +64,8 @@ def verify_create_form(func):
             payload = CreateOrderPayload(**request_json)
         except TypeError:
             return make_error_response(APIStatusCode.Wrong_Format, reason="argument type wrong")
+        except ValueError:
+            return make_error_response(APIStatusCode.Wrong_Format, reason='argument format wrong')
 
         return func(*args, **kwargs)
     return wrap

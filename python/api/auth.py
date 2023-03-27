@@ -4,6 +4,8 @@ from datetime import datetime, timedelta
 import hashlib
 import uuid
 from utils.jwt_util import JWTGenerator
+from utils.respons_util import make_error_response
+from utils.enum_util import APIStatusCode
 
 from flask import Blueprint, jsonify, make_response, Response, request, current_app
 
@@ -87,12 +89,42 @@ def login():
     ).first()
 
     if user is not None:
-        res = make_response(json.dumps({"cause": 0}))
+        res = make_response(json.dumps({"status": 0}))
         token_setter(name="User_Token", respond=res,
                      payload={"user_id": user.id})
         return res
     else:
-        return jsonify({"cause": 102})
+        return make_error_response(APIStatusCode.WrongLoginInfo, reason='wrong password or id!')
+
+
+@auth_api.route("/Loginadmin", methods=['POST'])
+def loginadmin():
+    """
+        用於驗證使用者登入資訊，並發放token
+
+        :parameter:
+            - name: str
+            - email: str
+            - password: str
+        :return:
+            - application/json
+    """
+    auth_info = request.json
+    auth_info['password'] = hashlib.sha256(request.json['password'].encode("utf-8")).hexdigest()
+    # 確認有沒有此account
+    user: Account = Account.query.filter(
+        Account.student_id == auth_info['student_id'],
+        Account.password == auth_info['password'],
+        Account.permission == 1
+    ).first()
+
+    if user is not None:
+        res = make_response(json.dumps({"status": 0}))
+        token_setter(name="User_Token", respond=res,
+                     payload={"user_id": user.id})
+        return res
+    else:
+        return make_error_response(APIStatusCode.WrongLoginInfo, reason='wrong password or id!')
 
 
 @auth_api.route("/Logoff", methods=['POST'])
@@ -105,7 +137,7 @@ def logoff():
         return "", 401
 
     res = make_response(json.dumps({
-        "cause": 0
+        "status": 0
     }))
     res.set_cookie("User_Token", "", expires=time.time() - 1)
     return res
