@@ -35,3 +35,8 @@ class ItemType(Enum):
 class ModifyAction(Enum):
     Add: int = 0
     Del: int = 1
+
+
+class DrawType(Enum):
+    single: int = 0
+    ten: int = 1

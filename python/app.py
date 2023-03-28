@@ -31,8 +31,8 @@ def create_app(config_filename=None):
     app.register_blueprint(account_api)
     app.register_blueprint(admin_api)
     app.register_blueprint(order_api)
+    app.register_blueprint(item_api)
     # app.register_blueprint(message_api)
-    # app.register_blueprint(item_api)
 
     from models import Order, Involve
     from sqlalchemy import func
@@ -49,4 +49,5 @@ def create_app(config_filename=None):
             "title": '管業員頁面',
         }
         return render_template('main.html', setting=setting)
+
     return app

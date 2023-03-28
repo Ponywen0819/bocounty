@@ -87,7 +87,7 @@ def modify_pool_item(*args, **kwargs):
 
     # db.session.begin()
     for info in modify_items:
-        print(info)
+        # print(info)
         check_item: int = Item.query.filter(
             Item.id == info['id']
         ).count()
