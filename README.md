@@ -15,6 +15,8 @@ cd ./python
 flask run -h 0.0.0.0 -p 8000
 ```
 
+> flask run -h <ip> -p <port>
+
 ## API文檔
 
 [API doc](./api_doc)
