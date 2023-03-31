@@ -29,7 +29,6 @@ class OwnItem(db.Model):
 class PickedItem(db.Model):
     user_id = Column(ForeignKey(Account.id), nullable=False, primary_key=True)
     item_id = Column(ForeignKey(Item.id), nullable=False)
-    type = Column(Integer, nullable=False)
 
 
 class Order(db.Model):
@@ -51,7 +50,7 @@ class Involve(db.Model):
 
 
 class Message(db.Model):
-    raw_id = Column(String, primary_key=True)
+    raw_id = Column(String, primary_key=True, autoincrement=True)
     chatroom_id = Column(ForeignKey(Involve.chatroom_id), nullable=False)
     sender_id = Column(ForeignKey(Account.id), nullable=False)
     content = Column(String, nullable=False)
@@ -67,5 +66,3 @@ class Pool(db.Model):
 class PoolItem(db.Model):
     pool_id = Column(ForeignKey(Pool.id), primary_key=True)
     item_id = Column(ForeignKey(Item.id), primary_key=True)
-
-

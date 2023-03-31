@@ -16,6 +16,8 @@ class APIStatusCode(Enum):
     CoinNotEnough: Code = Code(http_code=200, api_code=204)
     WrongLoginInfo: Code = Code(http_code=200, api_code=205)
     InstanceNotExist: Code = Code(http_code=200, api_code=206)
+    AlreadyExec: Code = Code(http_code=200, api_code=207)
+    InvalidAccess: Code = Code(http_code=200, api_code=208)
 
 
 class OrderListCode(Enum):
@@ -40,3 +42,8 @@ class ModifyAction(Enum):
 class DrawType(Enum):
     single: int = 0
     ten: int = 1
+
+
+class EquipAction(Enum):
+    remove: int = 0
+    euqip: int = 1

@@ -40,14 +40,28 @@ def create_app(config_filename=None):
 
     @app.route('/')
     def to_admin_page():
-        return redirect('/test')
+        return redirect('/page')
 
-    @app.route('/test/<path>')
-    @app.route('/test')
+    @app.route('/page/<path>')
+    @app.route('/page')
     def admin_page(path=None):
         setting = {
             "title": '管業員頁面',
         }
         return render_template('main.html', setting=setting)
+
+    @app.route("/test")
+    def test():
+        query = db.session.query(Order.id, Order.status, Order.title, Order.start_time).filter(
+            Order.owner_id != '1',
+            Order.status == 0,
+            ~db.session.query(Involve).filter(
+                Involve.involver_id == "",
+                Involve.order_id == Order.id
+            ).exists()
+        )
+        print(query)
+
+        return "", 200
 
     return app

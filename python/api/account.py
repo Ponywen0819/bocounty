@@ -2,20 +2,19 @@ from flask import Blueprint, current_app, request, jsonify
 from models import Account, Item, OwnItem, PickedItem
 from database import db
 from utils.auth_util import login_required, get_user_by_token
-from utils.enum_util import APIStatusCode
+from utils.enum_util import APIStatusCode, EquipAction
 from utils.respons_util import make_error_response
 
 account_api = Blueprint("acc_api", __name__)
 
 
-# @account_api.route('/getUserInfo/<id>', methods=['GET'])
-@account_api.route('/getUserInfo', methods=['POST'])
+@account_api.route('/getUserInfo/<id>', methods=['GET'])
+@account_api.route('/getUserInfo', methods=['GET'])
 @login_required
-def get_user_info(*args, **kwargs):
-    if 'id' in request.json.keys():
-        require_id = request.json['id']
+def get_user_info(id=None):
+    if id is not None:
         user: Account = Account.query.filter(
-            Account.id == require_id
+            Account.id == id
         ).first()
     else:
         user: Account = get_user_by_token()
@@ -51,9 +50,9 @@ def check_user_verify(*args, **kwargs):
 def get_user_item(*args, **kwargs):
     user: Account = get_user_by_token()
 
-    item_list = Item.query.\
-        join(OwnItem, OwnItem.item_id == Item.id).\
-        join(Account, Account.id == OwnItem.user_id).\
+    item_list = Item.query. \
+        join(OwnItem, OwnItem.item_id == Item.id). \
+        join(Account, Account.id == OwnItem.user_id). \
         filter(Account.id == user.id).all()
 
     return jsonify({
@@ -62,21 +61,30 @@ def get_user_item(*args, **kwargs):
     })
 
 
-@account_api.route('/getUserOutlook', methods=['GET'])
+@account_api.route('/getUserOutlook/<id>', methods=["GET"])
+@account_api.route("/getUserOutlook", methods=["GET"])
 @login_required
-def get_user_outlook(*args, **kwargs):
-    user: Account = get_user_by_token()
+def get_user_outlook(id=None):
+    if id is not None:
+        user: Account = Account.query.filter(Account.id == id).first()
+    else:
+        user: Account = get_user_by_token()
 
-    item_list, equ_types = db.session.query(Item, PickedItem.type).\
-        join(PickedItem, Item.id == PickedItem.item_id).\
-        join(Account, Account.id == PickedItem.user_id).\
-        fliter(PickedItem.user_id == user.id).\
+    item_list = db.session.query(Item.id, Item.name, Item.photo, Item.type). \
+        join(PickedItem, Item.id == PickedItem.item_id). \
+        join(Account, Account.id == PickedItem.user_id). \
+        filter(PickedItem.user_id == user.id). \
         all()
 
-    for item, equ_type in zip(item_list, equ_types):
-        print(item.type, equ_type)
+    items_info = [
+        dict(zip(['id', 'name', 'photo', 'type'], row))
+        for row in item_list
+    ]
 
-    return '', 200
+    return jsonify({
+        "status": 0,
+        "list": items_info
+    })
 
 
 @account_api.route('/getUserCoin', methods=['GET'])
@@ -110,5 +118,45 @@ def change_user_info(*args, **kwargs):
 @account_api.route('/changeUserOutlook', methods=['POST'])
 @login_required
 def change_user_outlook(*args, **kwargs):
-    pass
+    request_json: dict = request.json
+    if "list" not in request_json.keys():
+        return make_error_response(APIStatusCode.Wrong_Format, reason='missing \'list\' argument!')
 
+    item_list = request_json['list']
+
+    user: Account = get_user_by_token()
+    for item in item_list:
+        if "id" not in item.keys():
+            return make_error_response(APIStatusCode.Wrong_Format, reason="missing 'id' argument!")
+        if 'action' not in item.keys():
+            return make_error_response(APIStatusCode.Wrong_Format, reason="missing 'action' argument!")
+
+        item_id = item['id']
+        action = EquipAction(item['action'])
+
+        item_data: Item = Item.query.filter(
+            Item.id == item_id
+        ).first()
+
+        if item_data is None:
+            return make_error_response(APIStatusCode.InstanceNotExist, reason="The item with given id is not exist!")
+        old_item: PickedItem = PickedItem.query.join(
+            Item,
+            Item.id == PickedItem.item_id
+        ).filter(
+            PickedItem.user_id == user.id,
+            Item.type == item_data.type
+        ).first()
+
+        if old_item is not None:
+            db.session.delete(old_item)
+
+        if action == EquipAction.euqip:
+            db.session.add(PickedItem(
+                user_id=user.id,
+                item_id=item_data.id
+            ))
+    db.session.commit()
+    return jsonify({
+        "status": 0
+    })
