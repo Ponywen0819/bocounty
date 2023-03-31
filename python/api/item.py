@@ -6,20 +6,23 @@ from utils.auth_util import get_user_by_token
 from utils import get_now
 from database import db
 from models import Item, PoolItem, Pool, OwnItem, Account
-
+from sqlalchemy import func
 import random
 
 item_api = Blueprint("item_api", __name__)
 
 
-@item_api.route('/getPoolItemList', methods=['POST'])
+@item_api.route('/getPoolItemList/<id>', methods=["GET"])
 @login_required
-def get_pool_item_list(*args, **kwargs):
-    request_json: dict = request.json
-    if 'id' not in request_json.keys():
-        return make_error_response(APIStatusCode.Wrong_Format, reason='missing \'id\' argument!')
+def get_pool_item_list(id):
+    pool_id = id
 
-    pool_id = request_json['id']
+    pool: Pool = Pool.query.filter(
+        Pool.id == id
+    ).first()
+
+    if pool is None:
+        return make_error_response(APIStatusCode.InstanceNotExist, reason="The pool with given id is not exist!")
 
     items = db.session.query(Item.id, Item.name, Item.photo). \
         join(PoolItem, PoolItem.item_id == Item.id). \
@@ -87,4 +90,21 @@ def draw_cards(*args, **kwargs):
     return jsonify({
         "status": 0,
         "list": picked_item_info
+    })
+
+
+@item_api.route('/listPool', methods=['GET'])
+@login_required
+def list_pool(*args, **kwargs):
+    pools_and_counts = db.session.query(Pool.id, Pool.name, Pool.photo, func.count(Item.id)). \
+        join(PoolItem, PoolItem.pool_id == Pool.id, isouter=True). \
+        join(Item, Item.id == PoolItem.item_id, isouter=True). \
+        group_by(Pool.id).all()
+    pools_info = [
+        dict(zip(['id', 'name', 'photo', 'num'], row))
+        for row in pools_and_counts
+    ]
+    return jsonify({
+        "status": 0,
+        "pools": pools_info
     })

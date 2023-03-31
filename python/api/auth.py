@@ -12,7 +12,6 @@ from flask import Blueprint, jsonify, make_response, Response, request, current_
 from database import db
 from models import Account, PickedItem
 
-
 auth_api = Blueprint('auth_api', __name__)
 
 
@@ -29,10 +28,15 @@ def register():
             - email: str
             - password: str
     """
-    require_field = ["student_id", "name", "password"]
-    for need in require_field:
-        if need not in request.json.keys():
-            return jsonify({"cause": 102})
+    request_json: dict = request.json
+    if "student_id" not in request_json.keys():
+        return make_error_response(APIStatusCode.Wrong_Format, reason="missing 'student_id' argument!")
+
+    if "name" not in request_json.keys():
+        return make_error_response(APIStatusCode.Wrong_Format, reason="missing 'name' argument!")
+
+    if "password" not in request_json.keys():
+        return make_error_response(APIStatusCode.Wrong_Format, reason="missing 'password' argument!")
 
     # 確認帳號使否重複
     user_count = Account.query.filter(
@@ -70,17 +74,12 @@ def register():
 
 @auth_api.route("/Login", methods=['POST'])
 def login():
-    """
-        用於驗證使用者登入資訊，並發放token
+    auth_info: dict = request.json
+    if "student_id" not in auth_info.keys():
+        return make_error_response(APIStatusCode.Wrong_Format, reason="missing 'student_id' argument!")
+    if "password" not in auth_info.keys():
+        return make_error_response(APIStatusCode.Wrong_Format, reason="missing 'password' argument!")
 
-        :parameter:
-            - name: str
-            - email: str
-            - password: str
-        :return:
-            - application/json
-    """
-    auth_info = request.json
     auth_info['password'] = hashlib.sha256(request.json['password'].encode("utf-8")).hexdigest()
     # 確認有沒有此account
     user: Account = Account.query.filter(

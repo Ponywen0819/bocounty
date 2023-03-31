@@ -20,7 +20,7 @@ def get_user_info(id=None):
         user: Account = get_user_by_token()
 
     if user is None:
-        return make_error_response(APIStatusCode.RequireMissmatch, reason="user isn't exist")
+        return make_error_response(APIStatusCode.InstanceNotExist, reason="user isn't exist")
     return jsonify({
         'status': 0,
         'id': user.id,
@@ -50,14 +50,19 @@ def check_user_verify(*args, **kwargs):
 def get_user_item(*args, **kwargs):
     user: Account = get_user_by_token()
 
-    item_list = Item.query. \
+    item_list = db.session.query(Item.id, Item.name, Item.type, Item.photo). \
         join(OwnItem, OwnItem.item_id == Item.id). \
         join(Account, Account.id == OwnItem.user_id). \
         filter(Account.id == user.id).all()
 
+    item_info = [
+        dict(zip(["item_id", "name", "type", "photo"], row))
+        for row in item_list
+    ]
+
     return jsonify({
         'status': 0,
-        "list": item_list
+        "list": item_info
     })
 
 

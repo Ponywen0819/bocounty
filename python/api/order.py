@@ -23,7 +23,7 @@ def get_user_order():
     ).all()
 
     res_list = [
-        zip(["id", "status", "title", "start_time"], row)
+        dict(zip(["id", "status", "title", "start_time"], row))
         for row in list
     ]
 
@@ -48,7 +48,7 @@ def get_open_order():
     ).all()
 
     order_info = [
-        zip(["id", "status", "title", "start_time"], row)
+        dict(zip(["id", "status", "title", "start_time"], row))
         for row in orders
     ]
 
@@ -71,7 +71,7 @@ def get_order_involve():
     ).all()
 
     order_info = [
-        zip(["id", "status", "title", "start_time", "chatroom_id"], row)
+        dict(zip(["id", "status", "title", "start_time", "chatroom_id"], row))
         for row in orders
     ]
 
@@ -130,22 +130,16 @@ def get_order_involve():
 #     })
 
 
-@order_api.route('/getOrderInfo', methods=['GET'])
+@order_api.route('/getOrderInfo/<id>', methods=["GET"])
 @login_required
-def get_order_info(*args, **kwargs):
-    try:
-        request_json: dict = request.json
-        order_id: str = request_json['id']
-    except TypeError:
-        return make_error_response(APIStatusCode.Wrong_Format, reason='wrong id data type')
-
+def get_order_info(id):
     order_info: (Order, str) = db.session.query(Order, Account.name). \
         join(Account, Account.id == Order.owner_id). \
-        filter(Order.id == order_id). \
+        filter(Order.id == id). \
         first()
 
     if order_info is None:
-        return make_error_response(APIStatusCode.RequireMissmatch, reason="request order isn't exist")
+        return make_error_response(APIStatusCode.InstanceNotExist, reason="The order with given id is not exist!")
 
     order = order_info[0]
 
@@ -202,33 +196,31 @@ def create_order(*args, **kwargs):
     })
 
 
-@order_api.route('/deleteOrder', methods=['POST'])
+@order_api.route('/deleteOrder/<id>', methods=["GET"])
 @login_required
-def del_order():
-    order: Order = Order.query.filter(
-        Order.id == request.json['id']
-    )
+def del_order(id):
+    user: Account = get_user_by_token()
 
-    if Order is None:
-        return make_error_response(APIStatusCode.RequireMissmatch, reason='no order found')
+    order: Order = Order.query.filter(
+        Order.id == id
+    ).first()
+
+    if order is None:
+        return make_error_response(APIStatusCode.InstanceNotExist, reason="The order with given id is not exist!")
+    elif order.owner_id != user.id:
+        return make_error_response(APIStatusCode.InvalidAccess, reason="Access others Order!")
     else:
         db.session.delete(order)
         db.session.commit()
-        return_code = 0
     return jsonify({
-        "status": return_code
+        "status": 0
     })
 
 
-@order_api.route("/joinOrder", methods=["POST"])
+@order_api.route("/joinOrder/<id>", methods=["POST"])
 @login_required
-def join_order(*args, **kwargs):
-    request_json: dict = request.json
-    if "id" not in request_json.keys():
-        return make_error_response(APIStatusCode.Wrong_Format, reason="missing 'id' argument!")
-
-    order_id = request_json["id"]
-
+def join_order(id):
+    order_id = id
     user: Account = get_user_by_token()
 
     involve: Involve = Involve.query.filter(
@@ -241,10 +233,13 @@ def join_order(*args, **kwargs):
 
     order: Order = Order.query.filter(
         Order.id == order_id
-    )
+    ).first()
 
     if order is None:
         return make_error_response(APIStatusCode.InstanceNotExist, reason="order with given id is not exist!")
+
+    if order.status != 0:
+        return make_error_response(APIStatusCode.InvalidAccess, reason="Order has been closed!")
 
     new_chat_id = uuid.uuid4().hex
 

@@ -11,30 +11,19 @@ from models import Pool, Item, PoolItem
 admin_api = Blueprint('admin_api', __name__)
 
 
-@admin_api.route('/listPool', methods=['GET'])
-@admin_required
-def list_pool(*args, **kwargs):
-    pools_and_counts = db.session.query(Pool.id, Pool.name, Pool.photo, func.count(Item.id)). \
-        join(PoolItem, PoolItem.pool_id == Pool.id, isouter=True). \
-        join(Item, Item.id == PoolItem.item_id, isouter=True). \
-        group_by(Pool.id).all()
-    pools_info = [
-        dict(zip(['id', 'name', 'photo', 'num'], row))
-        for row in pools_and_counts
-    ]
-    return jsonify({
-        "status": 0,
-        "pools": pools_info
-    })
-
-
 @admin_api.route('/createPool', methods=['POST'])
 @admin_required
 def create_pool(*args, **kwargs):
     req_json: dict = request.json
 
     new_pool_id = uuid.uuid4().hex
+
+    if "name" not in req_json.keys():
+        return make_error_response(APIStatusCode.Wrong_Format, reason="missing 'name' argument!")
     new_pool_name = request.json['name']
+
+    if "photo" not in req_json.keys():
+        return make_error_response(APIStatusCode.Wrong_Format, reason="missing 'photo' argument!")
     new_pool_photo_path = storage_photo(req_json['photo'], StorgeCode.POOL)
 
     if new_pool_photo_path is None:
@@ -53,15 +42,15 @@ def create_pool(*args, **kwargs):
     })
 
 
-@admin_api.route('/deletePool', methods=['POST'])
+@admin_api.route('/deletePool/<id>', methods=['POST'])
 @admin_required
-def delete_pool(*args, **kwargs):
+def delete_pool(id):
     pool: Pool = Pool.query.filter(
-        Pool.id == request.json['id']
+        Pool.id == id
     ).first()
 
     if pool is None:
-        return make_error_response(APIStatusCode.RequireMissmatch, reason="pool isn't exist")
+        return make_error_response(APIStatusCode.InstanceNotExist, reason="pool isn't exist")
     else:
         db.session.delete(pool)
         db.session.commit()
@@ -142,8 +131,16 @@ def create_item(*args, **kwargs):
     req_json: dict = request.json
 
     new_item_id = uuid.uuid4().hex
+    if "name" not in req_json.keys():
+        return make_error_response(APIStatusCode.Wrong_Format, reason="missing 'name' argument!")
     new_item_name = req_json['name']
+
+    if "type" not in req_json.keys():
+        return make_error_response(APIStatusCode.Wrong_Format, reason="missing 'type' argument!")
     new_item_type = req_json['type']
+
+    if "photo" not in req_json.keys():
+        return make_error_response(APIStatusCode.Wrong_Format, reason="missing 'photo' argument!")
     new_item_photo = storage_photo(req_json['photo'], StorgeCode.ITEM)
 
     new_item = Item(
@@ -156,25 +153,24 @@ def create_item(*args, **kwargs):
     db.session.commit()
     return jsonify({
         "status": 0,
-        "pool_id": new_item_id
+        "id": new_item_id
     })
 
 
-@admin_api.route('/deleteItem', methods=['POST'])
+@admin_api.route('/deleteItem/<id>', methods=['POST'])
 @admin_required
-def del_item(*args, **kwargs):
+def del_item(id):
     item: Item = Item.query.filter(
-        Pool.id == request.json['id']
+        Pool.id == id
     ).first()
 
     if item is None:
-        return_code = 104
+        return make_error_response(APIStatusCode.InstanceNotExist, reason="The item with the given id is not exist!")
     else:
         db.session.delete(item)
         db.session.commit()
-        return_code = 0
     return jsonify({
-        "status": return_code
+        "status": 0
     })
 
 
@@ -182,6 +178,10 @@ def del_item(*args, **kwargs):
 @admin_required
 def modify_item_info(*args, **kwargs):
     req_json: dict = request.json
+
+    if "id" not in req_json.keys():
+        return make_error_response(APIStatusCode.Wrong_Format, reason="The item with given id is not exist!")
+
     item = Item.query.filter(
         Item.id == req_json['id']
     ).first()

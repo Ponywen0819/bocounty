@@ -1,11 +1,51 @@
+# API要求
+
+> 所有輸入輸出都是使用json格式
+
+## 錯誤回應碼
+
+`NotLogin: Code = Code(http_code=401, api_code=200)`
+
+表示使用者尚未登入
+
+`NotGrant: Code = Code(http_code=401, api_code=201)`
+
+表示使用者並未使用管理員帳號或是尚未登入
+
+`Wrong_Format: Code = Code(http_code=400, api_code=202)`
+
+使用者未給予規定的參數
+
+`CoinNotEnough: Code = Code(http_code=200, api_code=204)`
+
+使用者未擁有足夠滿足此操作的硬幣數量
+
+`WrongLoginInfo: Code = Code(http_code=200, api_code=205)`
+
+未知的使用者帳號密碼組合
+
+`InstanceNotExist: Code = Code(http_code=200, api_code=206)`
+
+未知的操作目標
+
+`AlreadyExec: Code = Code(http_code=200, api_code=207)`
+
+呼叫不能重複操作的API
+
+`InvalidAccess: Code = Code(http_code=200, api_code=208)`
+
+並未擁有權限
+
 ## 驗證API
 
 - [x]  Login
 
-  描述：獲得使用者token
+方法：POST
+
+描述：獲得使用者token
 
     - 輸入
-        - school_id: str
+        - student_id: str
 
           使用者註冊之學號
 
@@ -20,10 +60,12 @@
 
 - [x]  /Register
 
-  描述：註冊帳號，並在註冊成功後取得使用者token
+方法：POST
+
+描述：註冊帳號，並在註冊成功後取得使用者token
 
     - 輸入
-        - school_id: str
+        - student_id: str
 
           使用者註冊之學號
 
@@ -42,7 +84,9 @@
 
 - [x]  /Logoff
 
-  描述：使使用者token失效
+方法：POST
+
+描述：使使用者token失效
 
     - 輸入
 
@@ -57,12 +101,40 @@
 
 - [x]  getUserInfo
 
-  描述：取得使用者資訊
+方法：GET
+
+描述：取得使用者資訊
 
     - 輸入
+
+      不需要輸入
+
+    - 回應
+        - status: int
+
+          表示API要求的狀態。
+
         - id: str
 
-          選填，表示查詢的帳號，預設為使用者本身
+          使用者編號
+
+        - name
+
+          該使用者的名字
+
+        - intro
+
+          該使用者的簡介
+
+- [x]  getUserInfo/<id>
+
+方法：GET
+
+描述：依照ID取得使用者資訊
+
+    - 輸入
+
+      不需要輸入
 
     - 回應
         - status: int
@@ -83,7 +155,9 @@
 
 - [x]  checkUserVerify
 
-  描述：確認使用者郵件認證狀態
+方法：GET
+
+描述：確認使用者郵件認證狀態
 
     - 輸入
 
@@ -102,14 +176,51 @@
                       | --- | --- |
           | 0 | 尚未認證 |
           | 1 | 已完成認證 |
+
 - [x]  getUserOutlook
 
-  描述：取得使用者外觀設定
+方法：GET
+
+描述：取得使用者外觀設定
 
     - 輸入
-        - id: str
 
-          選填，表示查詢的帳號，預設為使用者本身
+      不需要輸入
+
+    - 回應
+        - status: int
+
+          表示API要求的狀態。
+
+        - list: list[obj]
+
+          使用者裝備列表
+
+            - type: int
+
+              此配備的種類
+
+            - photo: str
+
+              此配備的圖片
+
+            - id: str
+
+              此配備的編號
+
+            - name: str
+
+              此配備的名字
+
+- [x]  getUserOutlook/<id>
+
+方法：GET
+
+描述：依照ID取得使用者外觀設定
+
+    - 輸入
+
+      不需要輸入
 
     - 回應
         - status: int
@@ -138,7 +249,9 @@
 
 - [x]  getUserItem
 
-  描述：取得使用者已擁有的物品
+方法：GET
+
+描述：取得使用者已擁有的物品
 
     - 輸入
 
@@ -171,7 +284,9 @@
 
 - [x]  getUserCoin
 
-  描述：取得使用者擁有之硬幣數量
+方法：GET
+
+描述：取得使用者擁有之硬幣數量
 
     - 輸入
 
@@ -188,7 +303,9 @@
 
 - [x]  changeUserInfo
 
-  描述：上傳變更後的使用者名稱或簡介
+方法：POST
+
+描述：上傳變更後的使用者名稱或簡介
 
     - 輸入
         - name: str
@@ -206,7 +323,9 @@
 
 - [x]  changeUserOutlook
 
-  描述：更改使用者更改後的服裝搭配。
+方法：POST
+
+描述：更改使用者更改後的服裝搭配。
 
     - 輸入
         - list: list[obj]
@@ -232,14 +351,15 @@
 
 ## 物品操作API
 
-- [x]  getPoolItemList
+- [x]  getPoolItemList/<id>
 
-  描述：給定編號取得該抽獎池中的物品
+方法：GET
+
+描述：給定編號取得該抽獎池中的物品
 
     - 輸入
-        - ID: str
 
-          抽獎池的編號
+      不需要輸入
 
     - 回應
         - status: int
@@ -252,13 +372,19 @@
 
 - [x]  drawCards
 
-  描述：給定模式與抽獎池編號，給出抽獎結果
+方法：POST
+
+描述：給定模式與抽獎池編號，給出抽獎結果
 
     - 輸入
         - type
 
-          表示抽獎類型 （單抽、十連抽）
+          表示抽獎類型
 
+          | 編號 | 操作 |
+                      | --- | --- |
+          | 0 | 單抽 |
+          | 1 | 十連抽 |
         - pool
 
           抽卡池編號
@@ -272,11 +398,48 @@
 
           此次收抽獎所獲得的物品圖片路徑
 
+- [x]  listPool
+
+方法：GET
+
+描述：取出卡池列表
+
+    - 輸入
+
+      不需要輸入
+
+    - 回應
+        - status: int
+
+          表示API要求的狀態。
+
+        - pool_list: list[obj]
+
+          卡池資料集合
+
+            - id: str
+
+              卡池編號
+
+            - num: int
+
+              卡池內容物數量
+
+            - name: str
+
+              卡池名稱
+
+            - photo: str
+
+              卡池圖片路徑
+
 ## 委託操作API
 
 - [x]  getUserOrder
 
-  描述：取得使用者發出的委託
+方法：GET
+
+描述：取得使用者發出的委託
 
     - 輸入
 
@@ -306,7 +469,9 @@
 
 - [x]  getOpenOrder
 
-  描述：取得招募中之委託
+方法：GET
+
+描述：取得招募中之委託
 
     - 輸入
 
@@ -334,8 +499,10 @@
 
               委託創建時間
 
-
 - [x]  getJoinOrder
+
+方法：GET
+
     - 輸入
 
       不需要輸入
@@ -366,10 +533,9 @@
 
               聊天室編號
 
+- [ ]  getOrderList
 
-- [x]  getOrderList
-
-  描述：依條件取得委託列表
+描述：依條件取得委託列表
 
     - 輸入
         - type: int
@@ -403,14 +569,15 @@
 
               此委託的標題
 
-- [ ]  getOrderInfo
+- [x]  getOrderInfo/<id>
 
-  描述：給定編號取得該委託之資料
+方法：GET
+
+描述：給定編號取得該委託之資料
 
     - 輸入
-        - id: str
 
-          此委託的編號
+      不需要輸入
 
     - 回應
         - status: int
@@ -448,7 +615,7 @@
 
 - [ ]  pushOrderState
 
-  描述：給定編號使該委託進入下一階段
+描述：給定編號使該委託進入下一階段
 
     - 輸入
         - id: str
@@ -469,9 +636,12 @@
           | 0 | 招募中 |
           | 1 | 進行中 |
           | 2 | 已完成 |
+
 - [x]  createOrder
 
-  描述：創建新的委託
+方法：POST
+
+描述：創建新的委託
 
     - 輸入
         - title: str
@@ -503,29 +673,30 @@
 
           新委託的編號
 
-- [x]  deleteOrder
+- [x]  deleteOrder/<id>
 
-  描述：刪除委託
+方法：GET
+
+描述：依照ID刪除委託
 
     - 輸入
-        - id: str
 
-          欲刪除委託之編號
+      不需要輸入
 
     - 回應
         - status:int
 
           表示API要求的狀態。
 
+- [x]  joinOrder/<id>
 
-- [x]  **joinOrder**
+方法：GET
 
-  描述：使用者參加選定的委託
+描述：使用者參加選定的委託
 
     - 輸入
-        - id: str
 
-          委託編號
+      不需要輸入
 
     - 回應
         - status: int
@@ -538,9 +709,11 @@
 
 ## 訊息操作API
 
-- [ ]  sendMessage
+- [x]  sendMessage
 
-  描述：使用者傳送訊息至指定聊天室
+方法：POST
+
+描述：使用者傳送訊息至指定聊天室
 
     - 輸入
         - chatroom_id: str
@@ -556,14 +729,15 @@
 
           表示API要求的狀態。
 
-- [ ]  getChatInfo
+- [x]  getChatInfo/<id>
 
-  描述：給定編號取得該聊天室資訊
+方法：GET
+
+描述：給定編號取得該聊天室資訊
 
     - 輸入
-        - id: str
 
-          聊天室編號
+      不需要輸入
 
     - 回應
         - status: int
@@ -572,20 +746,21 @@
 
         - chaters: list[str]
 
-          此聊天室參加人的列表
+          此聊天室參加人的編號列表
 
         - owner_id: str
 
           聊天室擁有者編號
 
-- [ ]  getChatHistory
+- [x]  getChatHistory/<id>
 
-  描述：給定編號取得該聊天室之歷史內容
+方法：GET
+
+描述：給定編號取得該聊天室之歷史內容
 
     - 輸入
-        - id: str
 
-          聊天室編號
+      不需要編號
 
     - 回應
         - status: int
@@ -608,40 +783,11 @@
 
               訊息傳送時間
 
-- [ ]  assignOrder
+- [x]  assignOrder/<id>
 
-  描述：指派委託給聊天室的另一方
+方法：POST
 
-    - 輸入
-        - chat_id: str
-    - 回應
-        - status: int
-
-          表示API要求的狀態。
-
-- [ ]  confirmOrder
-
-  描述：確認承接人完成委託並且發放獎勵
-
-    - 輸入
-        - order_id: str
-
-          委託的編號
-
-        - involver_id: str
-
-          承接人編號
-
-    - 回應
-        - status: int
-
-          表示API要求的狀態。
-
-## 管理員API
-
-- [x]  listPool
-
-  描述：取出卡池列表
+描述：指派委託給聊天室的另一方
 
     - 輸入
 
@@ -652,29 +798,28 @@
 
           表示API要求的狀態。
 
-        - pool_list: list[obj]
+- [x]  confirmOrder/<id>
 
-          卡池資料集合
+方法：POST
 
-            - id: str
+描述：依照給定聊天室ID，確認承接人完成委託並且發放獎勵
 
-              卡池編號
+    - 輸入
 
-            - num: int
+      不需要輸入
 
-              卡池內容物數量
+    - 回應
+        - status: int
 
-            - name: str
+          表示API要求的狀態。
 
-              卡池名稱
-
-            - photo: str
-
-              卡池圖片路徑
+## 管理員API
 
 - [x]  createPool
 
-  描述：創建新的抽卡池
+方法：POST
+
+描述：創建新的抽卡池
 
     - 輸入
         - name: str
@@ -684,6 +829,9 @@
         - photo: str
 
           圖片資料，使用base64轉換成字串
+          ex: data:image/jpeg;base64, <base64 資料>
+
+          上述範例為jpeg檔案
 
     - 回應
         - status: int
@@ -694,14 +842,15 @@
 
           新建卡池編號
 
-- [x]  deletePool
+- [x]  deletePool/<id>
 
-  描述：刪除抽卡池
+方法：POST
+
+描述：刪除抽卡池
 
     - 輸入
-        - Id: str
 
-          該卡池之編號
+      不需要輸入
 
     - 回應
         - status: int
@@ -710,7 +859,9 @@
 
 - [x]  modifyPoolItem
 
-  描述：變更抽卡池內容
+方法：POST
+
+描述：變更抽卡池內容
 
     - 輸入
         - id: str
@@ -740,7 +891,9 @@
 
 - [x]  listItem
 
-  描述：列出系統內發行的道具
+方法：GET
+
+描述：列出系統內發行的道具
 
     - 輸入
 
@@ -773,7 +926,9 @@
 
 - [x]  createItem
 
-  描述：新增物品
+方法：POST
+
+描述：新增物品
 
     - 輸入
         - name: str
@@ -797,9 +952,11 @@
 
           新增加道具的編號。
 
-- [x]  deleteItem
+- [x]  deleteItem/<id>
 
-  描述：刪除物品
+方法：POST
+
+描述：刪除物品
 
     - 輸入
         - id: str
@@ -811,10 +968,11 @@
 
           表示API要求的狀態。
 
-
 - [x]  modifyItemInfo
 
-  描述：更改配件資訊
+方法：POST
+
+描述：更改配件資訊
 
     - 輸入
         - id: str

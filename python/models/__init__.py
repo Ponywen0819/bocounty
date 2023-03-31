@@ -50,11 +50,11 @@ class Involve(db.Model):
 
 
 class Message(db.Model):
-    raw_id = Column(String, primary_key=True, autoincrement=True)
+    raw_id = Column(Integer, primary_key=True, autoincrement=True)
     chatroom_id = Column(ForeignKey(Involve.chatroom_id), nullable=False)
     sender_id = Column(ForeignKey(Account.id), nullable=False)
     content = Column(String, nullable=False)
-    time = Column(DATETIME, nullable=False)
+    time = Column(String, nullable=False)
 
 
 class Pool(db.Model):

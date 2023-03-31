@@ -32,7 +32,7 @@ def create_app(config_filename=None):
     app.register_blueprint(admin_api)
     app.register_blueprint(order_api)
     app.register_blueprint(item_api)
-    # app.register_blueprint(message_api)
+    app.register_blueprint(message_api)
 
     from models import Order, Involve
     from sqlalchemy import func
