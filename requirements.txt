@@ -2,7 +2,5 @@ Flask~=2.2.2
 flasgger~=0.9.5
 PyMySQL~=1.0.2
 PyJWT~=2.6.0
-pycryptodome
 Flask-SQLAlchemy
 SQLAlchemy==1.4.46
-mysqlclient
