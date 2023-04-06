@@ -6,6 +6,7 @@ from app.utils.enum_util import APIStatusCode, NotifyType
 from app.utils.respons_util import make_error_response
 from app.database import db
 from sqlalchemy import desc
+from datetime import timedelta
 
 message_api = Blueprint("message_api", __name__)
 
@@ -42,7 +43,7 @@ def send_message():
         chatroom_id=chatroom_id,
         sender_id=user.id,
         content=content,
-        time=get_now()
+        time=(get_now() + timedelta(days=7)).strftime("%Y-%m-%d %H:%M:%S")
     )
 
     db.session.add(new_Message)
@@ -209,7 +210,8 @@ def confirm_order(chatroom_id):
         user_id=involver.id,
         type=NotifyType.ownerPay.value,
         chatroom_id=chatroom_id,
-        mention_id=user.id
+        mention_id=user.id,
+        due_time=(get_now() + timedelta(days=7)).strftime("%Y-%m-%d %H:%M:%S")
     )
 
     db.session.add(new_notify)
@@ -240,7 +242,8 @@ def report_complete(chatroom_id):
         user_id=order.owner_id,
         type=NotifyType.userComplete.value,
         chatroom_id=chatroom_id,
-        mention_id=user.id
+        mention_id=user.id,
+        due_time=(get_now() + timedelta(days=7)).strftime("%Y-%m-%d %H:%M:%S")
     )
     db.session.add(new_notify)
     db.session.commit()
@@ -261,4 +264,17 @@ def get_notifies():
         Order, Order.id == Involve.order_id
     ).join(
         Account, Account.id == Order.owner_id
+    ).filter(
+        Notification.due_time > str(get_now()),
+        Notification.user_id == user.id
     ).all()
+
+    notify_list = [
+        dict(zip(["type", "order_id", "title", "price", "name"], row))
+        for row in notifies
+    ]
+
+    return jsonify({
+        "status": 0,
+        "list": notify_list
+    })

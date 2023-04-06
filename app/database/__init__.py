@@ -13,6 +13,20 @@ def check_db():
     return os.path.exists(full_file_path)
 
 
+def create_default_admin(student_id="123456789", name="預設管理員"):
+    from app.models import Account
+    admin_id = uuid.uuid4().hex
+    db.session.add(Account(
+        id=admin_id,
+        student_id=student_id,
+        name=name,
+        password='8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918',  # admin
+        permission=1,
+        bocoin=100
+    ))
+    db.session.commit()
+
+
 def create_db(flush=False):
     if flush or (not check_db()):
         with current_app.app_context():
@@ -21,18 +35,5 @@ def create_db(flush=False):
                 db.drop_all()
             print('create database')
             db.create_all()
-
     if flush:
-        from models import Account
-        admin_id = uuid.uuid4().hex
-        db.session.add(Account(
-            id=admin_id,
-            student_id='123456789',
-            name='預設管理員',
-            password='8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918',  # admin
-            permission=1,
-            bocoin=100
-        ))
-        db.session.commit()
-
-
+        create_default_admin()

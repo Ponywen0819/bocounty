@@ -74,3 +74,4 @@ class Notification(db.Model):
     type = Column(Integer)
     mention_id = Column(ForeignKey(Account.id))
     chatroom_id = Column(ForeignKey(Involve.chatroom_id))
+    due_time = Column(String)

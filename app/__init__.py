@@ -1,26 +1,26 @@
 from flask import Flask, render_template, redirect
 from flask_socketio import SocketIO
 
-socket = SocketIO()
+socket = SocketIO(logger=True, engineio_logger=True, manage_session=False)
 
 
 def create_app(config_filename=None):
-    app = Flask(__name__, template_folder='../template', static_folder='../src')
+    main = Flask(__name__, template_folder='../template', static_folder='../src')
     if config_filename is None:
-        app.config.from_pyfile('config.py')
+        main.config.from_pyfile('config.py')
     else:
-        app.config.from_pyfile(config_filename)
-
+        main.config.from_pyfile(config_filename)
     from app.utils.jwt_util import JWTGenerator
     # from .utils.jwt_util import JWTGenerator
-    app.config['jwt_gen']: JWTGenerator = JWTGenerator()
+    main.config['jwt_gen']: JWTGenerator = JWTGenerator()
     # app.debug = True
 
     from app.database import db, create_db
-    db.init_app(app)
+    db.init_app(main)
 
-    with app.app_context():
-        create_db(flush=False)
+    from app import models
+    with main.app_context():
+        create_db(flush=True)
 
     from app.api.auth import auth_api
     from app.api.account import account_api
@@ -29,12 +29,14 @@ def create_app(config_filename=None):
     from app.api.item import item_api
     from app.api.message import message_api
 
-    app.register_blueprint(auth_api)
-    app.register_blueprint(account_api)
-    app.register_blueprint(admin_api)
-    app.register_blueprint(order_api)
-    app.register_blueprint(item_api)
-    app.register_blueprint(message_api)
+    main.register_blueprint(auth_api)
+    main.register_blueprint(account_api)
+    main.register_blueprint(admin_api)
+    main.register_blueprint(order_api)
+    main.register_blueprint(item_api)
+    main.register_blueprint(message_api)
 
-    socket.init_app(app)
-    return app
+    from .websocket import chat
+    socket.init_app(main)
+    # print(app.config)
+    return main
