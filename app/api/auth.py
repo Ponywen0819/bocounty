@@ -3,14 +3,14 @@ import time
 from datetime import datetime, timedelta
 import hashlib
 import uuid
-from utils.jwt_util import JWTGenerator
-from utils.respons_util import make_error_response
-from utils.enum_util import APIStatusCode
+from app.utils.jwt_util import JWTGenerator
+from app.utils.respons_util import make_error_response
+from app.utils.enum_util import APIStatusCode
 
 from flask import Blueprint, jsonify, make_response, Response, request, current_app
 
-from database import db
-from models import Account, PickedItem
+from app.database import db
+from app.models import Account, PickedItem
 
 auth_api = Blueprint('auth_api', __name__)
 

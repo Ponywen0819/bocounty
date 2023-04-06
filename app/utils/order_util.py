@@ -3,9 +3,9 @@ from flask import request
 from functools import wraps
 from datetime import datetime, timedelta, timezone
 import re
-from utils.enum_util import APIStatusCode
-from utils.respons_util import make_error_response
-from utils import get_now
+from app.utils.enum_util import APIStatusCode
+from app.utils.respons_util import make_error_response
+from app.utils import get_now
 
 
 @dataclass
@@ -34,6 +34,7 @@ class CreateOrderPayload:
 
         if self.price < 1:
             raise TypeError
+
     @property
     def get_close_time(self) -> datetime:
         return datetime.fromisoformat(self.close_time)
@@ -68,4 +69,5 @@ def verify_create_form(func):
             return make_error_response(APIStatusCode.Wrong_Format, reason='argument format wrong')
 
         return func(*args, **kwargs)
+
     return wrap

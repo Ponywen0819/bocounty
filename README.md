@@ -21,7 +21,7 @@ docker compose up
 ### 本地端
 
 ```shell
-cd ./python
+cd ./app
 flask run -h 0.0.0.0 -p 8000
 ```
 

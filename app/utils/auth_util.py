@@ -1,8 +1,8 @@
 from flask import current_app, request, abort, jsonify
-from utils.jwt_util import JWTGenerator
-from utils.respons_util import make_error_response
-from utils.enum_util import APIStatusCode
-from models import Account
+from app.utils.jwt_util import JWTGenerator
+from app.utils.respons_util import make_error_response
+from app.utils.enum_util import APIStatusCode
+from app.models import Account
 from functools import wraps
 
 
@@ -13,6 +13,7 @@ def verify_jwt(func):
             return 'require login', 401
         else:
             return func(*args, **kwargs)
+
     return wrap
 
 
@@ -30,6 +31,7 @@ def login_required(func):
             return make_error_response(APIStatusCode.NotLogin, reason='user not found')
 
         return func(*args, **kwargs)
+
     return wrapper
 
 
@@ -51,6 +53,7 @@ def admin_required(func):
             return make_error_response(APIStatusCode.NotGrant, reason='user has no permission')
 
         return func(*args, **kwargs)
+
     return wrapper
 
 
@@ -76,4 +79,3 @@ def _get_token_detail():
         return None
 
     return jwt_gen.get_token_detail(token)
-
