@@ -1,8 +1,8 @@
 from flask import current_app, request, abort, jsonify
-from utils.jwt_util import JWTGenerator
-from utils.respons_util import make_error_response
-from utils.enum_util import APIStatusCode
-from models import Account
+from app.utils.jwt_util import JWTGenerator
+from app.utils.respons_util import make_error_response
+from app.utils.enum_util import APIStatusCode
+from app.models import Account
 from functools import wraps
 
 
@@ -13,44 +13,39 @@ def verify_jwt(func):
             return 'require login', 401
         else:
             return func(*args, **kwargs)
+
     return wrap
 
 
 def login_required(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
-        token_info = _get_token_detail()
-        if token_info is None:
-            return make_error_response(APIStatusCode.NotLogin, reason='user has not token')
+        login_state = check_login()
 
-        user: Account = Account.query.filter(
-            Account.id == token_info['user_id']
-        )
-        if user is None:
+        if login_state == -1:
+            return make_error_response(APIStatusCode.NotLogin, reason='user has not token')
+        if login_state == -2:
             return make_error_response(APIStatusCode.NotLogin, reason='user not found')
 
         return func(*args, **kwargs)
+
     return wrapper
 
 
 def admin_required(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
-        token_info = _get_token_detail()
-        if token_info is None:
+        login_state = check_login(admin=True)
+
+        if login_state == -1:
             return make_error_response(APIStatusCode.NotLogin, reason='user has not token')
-
-        user: Account = Account.query.filter(
-            Account.id == token_info['user_id']
-        ).first()
-
-        if user is None:
+        if login_state == -2:
             return make_error_response(APIStatusCode.NotLogin, reason='user not found')
-
-        if user.permission != 1:
+        if login_state == -3:
             return make_error_response(APIStatusCode.NotGrant, reason='user has no permission')
 
         return func(*args, **kwargs)
+
     return wrapper
 
 
@@ -61,6 +56,22 @@ def get_user_by_token():
     ).first()
 
     return user
+
+
+def check_login(admin=False) -> int:
+    token_info = _get_token_detail()
+    if token_info is None:
+        return -1
+
+    user: Account = Account.query.filter(
+        Account.id == token_info['user_id']
+    )
+    if user is None:
+        return -2
+    if admin:
+        if user.permission != 1:
+            return -3
+    return 0
 
 
 def _get_token_detail():
@@ -76,4 +87,3 @@ def _get_token_detail():
         return None
 
     return jwt_gen.get_token_detail(token)
-

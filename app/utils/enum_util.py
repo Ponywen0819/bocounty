@@ -47,3 +47,8 @@ class DrawType(Enum):
 class EquipAction(Enum):
     remove: int = 0
     euqip: int = 1
+
+
+class NotifyType(Enum):
+    userComplete: int = 0
+    ownerPay: int = 1

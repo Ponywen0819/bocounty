@@ -1,5 +1,5 @@
 from flask import make_response, jsonify, abort
-from utils.enum_util import APIStatusCode
+from app.utils.enum_util import APIStatusCode
 
 
 def make_error_response(code: APIStatusCode, reason: str = ''):

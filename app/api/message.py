@@ -1,11 +1,12 @@
 from flask import Blueprint, request, jsonify
-from models import Message, Involve, Order, Account
-from utils import get_now
-from utils.auth_util import login_required, get_user_by_token
-from utils.enum_util import APIStatusCode
-from utils.respons_util import make_error_response
-from database import db
+from app.models import Message, Involve, Order, Account, Notification
+from app.utils import get_now
+from app.utils.auth_util import login_required, get_user_by_token
+from app.utils.enum_util import APIStatusCode, NotifyType
+from app.utils.respons_util import make_error_response
+from app.database import db
 from sqlalchemy import desc
+from datetime import timedelta
 
 message_api = Blueprint("message_api", __name__)
 
@@ -42,7 +43,7 @@ def send_message():
         chatroom_id=chatroom_id,
         sender_id=user.id,
         content=content,
-        time=get_now()
+        time=(get_now() + timedelta(days=7)).strftime("%Y-%m-%d %H:%M:%S")
     )
 
     db.session.add(new_Message)
@@ -205,7 +206,75 @@ def confirm_order(chatroom_id):
     involver.bocoin += order.price
     order.status = 2
 
+    new_notify = Notification(
+        user_id=involver.id,
+        type=NotifyType.ownerPay.value,
+        chatroom_id=chatroom_id,
+        mention_id=user.id,
+        due_time=(get_now() + timedelta(days=7)).strftime("%Y-%m-%d %H:%M:%S")
+    )
+
+    db.session.add(new_notify)
     db.session.commit()
     return jsonify({
         "status": 0
+    })
+
+
+@message_api.route("/reportComplete/<chatroom_id>", methods=["POST"])
+@login_required
+def report_complete(chatroom_id):
+    user: Account = get_user_by_token()
+
+    involve_record: Involve = Involve.quert.filter(
+        Involve.chatroom_id == chatroom_id,
+        Involve.involver_id == user.id
+    ).first()
+
+    if involve_record is None:
+        return make_error_response(APIStatusCode.InvalidAccess, reason="access others order!")
+
+    order: Order = Order.query.filter(
+        Order.id == involve_record.order_id
+    ).first()
+
+    new_notify = Notification(
+        user_id=order.owner_id,
+        type=NotifyType.userComplete.value,
+        chatroom_id=chatroom_id,
+        mention_id=user.id,
+        due_time=(get_now() + timedelta(days=7)).strftime("%Y-%m-%d %H:%M:%S")
+    )
+    db.session.add(new_notify)
+    db.session.commit()
+
+    return jsonify({
+        "status": 0
+    })
+
+
+@message_api.route("/getNotifies", methods=["GET"])
+@login_required
+def get_notifies():
+    user: Account = get_user_by_token()
+
+    notifies = db.session.query(Notification.type, Order.id, Order.title, Order.price, Account.name).join(
+        Involve, Involve.chatroom_id == Notification.chatroom_id
+    ).join(
+        Order, Order.id == Involve.order_id
+    ).join(
+        Account, Account.id == Order.owner_id
+    ).filter(
+        Notification.due_time > str(get_now()),
+        Notification.user_id == user.id
+    ).all()
+
+    notify_list = [
+        dict(zip(["type", "order_id", "title", "price", "name"], row))
+        for row in notifies
+    ]
+
+    return jsonify({
+        "status": 0,
+        "list": notify_list
     })

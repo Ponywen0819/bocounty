@@ -1,9 +1,9 @@
 from flask import Blueprint, current_app, request, jsonify
-from models import Account, Item, OwnItem, PickedItem
-from database import db
-from utils.auth_util import login_required, get_user_by_token
-from utils.enum_util import APIStatusCode, EquipAction
-from utils.respons_util import make_error_response
+from app.models import Account, Item, OwnItem, PickedItem
+from app.database import db
+from app.utils.auth_util import login_required, get_user_by_token
+from app.utils.enum_util import APIStatusCode, EquipAction
+from app.utils.respons_util import make_error_response
 
 account_api = Blueprint("acc_api", __name__)
 

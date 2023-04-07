@@ -1,5 +1,5 @@
 from sqlalchemy import Column, String, Integer, ForeignKey, DATETIME
-from database import db
+from app.database import db
 
 
 class Account(db.Model):
@@ -45,8 +45,8 @@ class Order(db.Model):
 
 class Involve(db.Model):
     chatroom_id = Column(String, primary_key=True)
-    order_id = Column(ForeignKey(Order.id), primary_key=True)
-    involver_id = Column(ForeignKey(Account.id), primary_key=True)
+    order_id = Column(ForeignKey(Order.id))
+    involver_id = Column(ForeignKey(Account.id))
 
 
 class Message(db.Model):
@@ -66,3 +66,12 @@ class Pool(db.Model):
 class PoolItem(db.Model):
     pool_id = Column(ForeignKey(Pool.id), primary_key=True)
     item_id = Column(ForeignKey(Item.id), primary_key=True)
+
+
+class Notification(db.Model):
+    raw_id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(ForeignKey(Account.id))
+    type = Column(Integer)
+    mention_id = Column(ForeignKey(Account.id))
+    chatroom_id = Column(ForeignKey(Involve.chatroom_id))
+    due_time = Column(String)
