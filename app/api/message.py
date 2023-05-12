@@ -7,6 +7,7 @@ from app.utils.respons_util import make_error_response
 from app.database import db
 from sqlalchemy import desc
 from datetime import timedelta
+from flask_socketio import emit
 
 message_api = Blueprint("message_api", __name__)
 
@@ -45,7 +46,15 @@ def send_message():
         content=content,
         time=(get_now() + timedelta(days=7)).strftime("%Y-%m-%d %H:%M:%S")
     )
-
+    emit("new",
+         {
+             "sender_id": user.id,
+             "content": content,
+             "time": (get_now() + timedelta(days=7)).strftime("%Y-%m-%d %H:%M:%S")
+         },
+         to=chatroom_id,
+         namespace='/chat'
+         )
     db.session.add(new_Message)
     db.session.commit()
     return jsonify({

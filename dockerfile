@@ -10,5 +10,5 @@ COPY . /etc/bocountry
 WORKDIR /etc/bocountry
 RUN pip install -r requirements.txt
 
-WORKDIR /etc/bocountry/python
-CMD sleep 10 && flask run --host 0.0.0.0 --port 8000
+WORKDIR /etc/bocountry
+CMD sleep 10 && python3 bocountry.py

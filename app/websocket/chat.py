@@ -1,22 +1,26 @@
 from .. import socket
-from flask_socketio import emit, send, ConnectionRefusedError
+from flask_socketio import emit, send, ConnectionRefusedError, join_room, disconnect
 from flask import session, request
+from app.models import Involve
 from app.utils.auth_util import check_login, get_user_by_token, login_required
 from app.models import Account
 
 
-@socket.on('connect')
-def test_connect(auth):
-    print(auth)
+@socket.on('join', namespace='/chat')
+def join_chat(data):
     login_state = check_login()
     if login_state != 0:
-        return False
+        raise ConnectionRefusedError("require login!")
+
+    if "chat_id" not in data.keys():
+        disconnect()
+        return
     user: Account = get_user_by_token()
-    session[user.id]: str = request.sid
-    emit('join', {'data': 42})
+    chatroom: Involve = Involve.query.filter(
+        Involve.chatroom_id == data['chat_id']
+    ).first()
 
-
-@socket.on('send')
-def sendd_msg(data):
-    print()
-    emit('join', {'data': 42})
+    if chatroom is None:
+        disconnect()
+        return
+    join_room(chatroom.chatroom_id)
