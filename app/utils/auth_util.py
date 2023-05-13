@@ -65,7 +65,7 @@ def check_login(admin=False) -> int:
 
     user: Account = Account.query.filter(
         Account.id == token_info['user_id']
-    )
+    ).first()
     if user is None:
         return -2
     if admin:
