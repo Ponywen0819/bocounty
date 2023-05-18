@@ -44,8 +44,8 @@ def create_app(config_filename=None):
 
     @main.route("/test")
     def test():
-        user = Account.query.all()
-        # send_verify_email(user)
+        user = Account.query.first()
+        send_verify_email(user)
         print(user)
         return "", 200
 
