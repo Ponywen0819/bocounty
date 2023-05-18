@@ -41,10 +41,12 @@ def create_app(config_filename=None):
 
     from app.utils.email_util import send_verify_email
     from app.models import Account
+
     @main.route("/test")
     def test():
-        user = Account.query.filter(Account.student_id == "109590027").first()
-        send_verify_email(user)
+        user = Account.query.all()
+        # send_verify_email(user)
+        print(user)
         return "", 200
 
     from .websocket import chat

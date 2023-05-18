@@ -1,6 +1,6 @@
-# API要求
+# API 要求
 
-> 所有輸入輸出都是使用json格式
+> 所有輸入輸出都是使用 json 格式
 
 ## 錯誤回應碼
 
@@ -30,19 +30,19 @@
 
 `AlreadyExec: Code = Code(http_code=200, api_code=207)`
 
-呼叫不能重複操作的API
+呼叫不能重複操作的 API
 
 `InvalidAccess: Code = Code(http_code=200, api_code=208)`
 
 並未擁有權限
 
-## 驗證API
+## 驗證 API
 
-- [x]  Login
+- [x] Login
 
 方法：POST
 
-描述：獲得使用者token
+描述：獲得使用者 token
 
     - 輸入
         - student_id: str
@@ -58,11 +58,11 @@
 
           表示API要求的狀態。
 
-- [x]  /Register
+- [x] /Register
 
 方法：POST
 
-描述：註冊帳號，並在註冊成功後取得使用者token
+描述：註冊帳號，並在註冊成功後取得使用者 token
 
     - 輸入
         - student_id: str
@@ -82,11 +82,11 @@
 
           表示API要求的狀態。
 
-- [x]  /Logoff
+- [x] /Logoff
 
 方法：POST
 
-描述：使使用者token失效
+描述：使使用者 token 失效
 
     - 輸入
 
@@ -97,9 +97,9 @@
 
           表示API要求的狀態。
 
-## 會員資訊操作API
+## 會員資訊操作 API
 
-- [x]  getUserInfo
+- [x] getUserInfo
 
 方法：GET
 
@@ -126,11 +126,11 @@
 
           該使用者的簡介
 
-- [x]  getUserInfo/<id>
+- [x] getUserInfo/<id>
 
 方法：GET
 
-描述：依照ID取得使用者資訊
+描述：依照 ID 取得使用者資訊
 
     - 輸入
 
@@ -153,7 +153,7 @@
 
           該使用者的簡介
 
-- [x]  checkUserVerify
+- [x] checkUserVerify
 
 方法：GET
 
@@ -173,11 +173,11 @@
           表示認證狀態
 
           | 代碼 | 認證狀態 |
-                      | --- | --- |
-          | 0 | 尚未認證 |
-          | 1 | 已完成認證 |
+          | ---  | ---    |
+          | 0 | 尚未認證   |
+          | 1 | 已完成認證  |
 
-- [x]  getUserOutlook
+- [x] getUserOutlook
 
 方法：GET
 
@@ -212,11 +212,11 @@
 
               此配備的名字
 
-- [x]  getUserOutlook/<id>
+- [x] getUserOutlook/<id>
 
 方法：GET
 
-描述：依照ID取得使用者外觀設定
+描述：依照 ID 取得使用者外觀設定
 
     - 輸入
 
@@ -247,7 +247,7 @@
 
               此配備的名字
 
-- [x]  getUserItem
+- [x] getUserItem
 
 方法：GET
 
@@ -282,7 +282,7 @@
 
               配件名稱
 
-- [x]  getUserCoin
+- [x] getUserCoin
 
 方法：GET
 
@@ -301,7 +301,7 @@
 
           持有多少硬幣
 
-- [x]  changeUserInfo
+- [x] changeUserInfo
 
 方法：POST
 
@@ -321,7 +321,7 @@
 
           表示API要求的狀態。
 
-- [x]  changeUserOutlook
+- [x] changeUserOutlook
 
 方法：POST
 
@@ -349,9 +349,9 @@
 
           表示API要求的狀態。
 
-## 物品操作API
+## 物品操作 API
 
-- [x]  getPoolItemList/<id>
+- [x] getPoolItemList/<id>
 
 方法：GET
 
@@ -370,7 +370,7 @@
 
           存放所有抽獎池內的物品編號
 
-- [x]  drawCards
+- [x] drawCards
 
 方法：POST
 
@@ -398,7 +398,7 @@
 
           此次收抽獎所獲得的物品圖片路徑
 
-- [x]  listPool
+- [x] listPool
 
 方法：GET
 
@@ -433,9 +433,9 @@
 
               卡池圖片路徑
 
-## 委託操作API
+## 委託操作 API
 
-- [x]  getUserOrder
+- [x] getUserOrder
 
 方法：GET
 
@@ -467,7 +467,7 @@
 
               委託創建時間
 
-- [x]  getOpenOrder
+- [x] getOpenOrder
 
 方法：GET
 
@@ -499,7 +499,7 @@
 
               委託創建時間
 
-- [x]  getJoinOrder
+- [x] getJoinOrder
 
 方法：GET
 
@@ -533,7 +533,7 @@
 
               聊天室編號
 
-- [ ]  getOrderList
+- [ ] getOrderList
 
 描述：依條件取得委託列表
 
@@ -569,7 +569,7 @@
 
               此委託的標題
 
-- [x]  getOrderInfo/<id>
+- [x] getOrderInfo/<id>
 
 方法：GET
 
@@ -613,7 +613,7 @@
 
           委託人的編號
 
-- [ ]  pushOrderState
+- [ ] pushOrderState
 
 描述：給定編號使該委託進入下一階段
 
@@ -637,7 +637,7 @@
           | 1 | 進行中 |
           | 2 | 已完成 |
 
-- [x]  createOrder
+- [x] createOrder
 
 方法：POST
 
@@ -673,11 +673,11 @@
 
           新委託的編號
 
-- [x]  deleteOrder/<id>
+- [x] deleteOrder/<id>
 
 方法：GET
 
-描述：依照ID刪除委託
+描述：依照 ID 刪除委託
 
     - 輸入
 
@@ -688,7 +688,7 @@
 
           表示API要求的狀態。
 
-- [x]  joinOrder/<id>
+- [x] joinOrder/<id>
 
 方法：GET
 
@@ -707,9 +707,9 @@
 
           給予參與者的聊天室編號
 
-## 訊息操作API
+## 訊息操作 API
 
-- [x]  sendMessage
+- [x] sendMessage
 
 方法：POST
 
@@ -729,7 +729,7 @@
 
           表示API要求的狀態。
 
-- [x]  getChatInfo/<id>
+- [x] getChatInfo/<id>
 
 方法：GET
 
@@ -752,7 +752,7 @@
 
           聊天室擁有者編號
 
-- [x]  getChatHistory/<id>
+- [x] getChatHistory/<id>
 
 方法：GET
 
@@ -783,7 +783,7 @@
 
               訊息傳送時間
 
-- [x]  assignOrder/<id>
+- [x] assignOrder/<id>
 
 方法：POST
 
@@ -798,11 +798,11 @@
 
           表示API要求的狀態。
 
-- [x]  confirmOrder/<id>
+- [x] confirmOrder/<id>
 
 方法：POST
 
-描述：依照給定聊天室ID，確認承接人完成委託並且發放獎勵
+描述：依照給定聊天室 ID，確認承接人完成委託並且發放獎勵
 
     - 輸入
 
@@ -813,9 +813,9 @@
 
           表示API要求的狀態。
 
-## 管理員API
+## 管理員 API
 
-- [x]  createPool
+- [x] createPool
 
 方法：POST
 
@@ -842,7 +842,7 @@
 
           新建卡池編號
 
-- [x]  deletePool/<id>
+- [x] deletePool/<id>
 
 方法：POST
 
@@ -857,7 +857,7 @@
 
           表示API要求的狀態。
 
-- [x]  modifyPoolItem
+- [x] modifyPoolItem
 
 方法：POST
 
@@ -889,7 +889,7 @@
 
           表示API要求的狀態。
 
-- [x]  listItem
+- [x] listItem
 
 方法：GET
 
@@ -924,7 +924,7 @@
 
               配件的種類
 
-- [x]  createItem
+- [x] createItem
 
 方法：POST
 
@@ -952,7 +952,7 @@
 
           新增加道具的編號。
 
-- [x]  deleteItem/<id>
+- [x] deleteItem/<id>
 
 方法：POST
 
@@ -968,7 +968,7 @@
 
           表示API要求的狀態。
 
-- [x]  modifyItemInfo
+- [x] modifyItemInfo
 
 方法：POST
 
