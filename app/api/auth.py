@@ -5,8 +5,8 @@ import hashlib
 import uuid
 from app.utils.jwt_util import JWTGenerator
 from app.utils.respons_util import make_error_response
-from app.utils.enum_util import APIStatusCode
-from app.utils.auth_util import register
+from app.utils.enum_util import APIStatusCode, LoginState
+from app.utils.auth_util import register, check_login
 
 from flask import Blueprint, jsonify, make_response, Response, request, current_app
 
@@ -60,13 +60,17 @@ def login():
         Account.password == auth_info['password']
     ).first()
 
-    if user is not None:
+    setting: dict = current_app.config["setting"]
+    if user is None:
+        return make_error_response(APIStatusCode.WrongLoginInfo, reason='wrong password or id!')
+    elif setting["mail"]["enable"]:
+        if user.mail_verify == 0:
+            return make_error_response(APIStatusCode.NotVerify, reason="Account not verified!")
+    else:
         res = make_response(json.dumps({"status": 0}))
         token_setter(name="User_Token", respond=res,
                      payload={"user_id": user.id})
         return res
-    else:
-        return make_error_response(APIStatusCode.WrongLoginInfo, reason='wrong password or id!')
 
 
 @auth_api.route("/Loginadmin", methods=['POST'])

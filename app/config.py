@@ -6,4 +6,4 @@ SQLALCHEMY_DATABASE_URI: str = "sqlite:///" + \
 STORAGE_PATH: str = os.path.join(os.path.abspath("."), "storage")
 SETTING_FILE: str = os.path.join(os.path.abspath("."), "setting.json")
 DBFLUSH: bool = False
-DEBUG: bool = False
+DEBUG: bool = True

@@ -9,7 +9,7 @@ class Account(db.Model):
     password = Column(String, nullable=False)
     bocoin = Column(Integer, nullable=False, default=0)
     intro = Column(String, nullable=False, default='')
-    mail_verify = Column(String, nullable=False, default=0)
+    mail_verify = Column(Integer, nullable=False, default=0)
     permission = Column(Integer, nullable=False, default=0)
 
 

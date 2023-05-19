@@ -1,6 +1,6 @@
 from app.utils.jwt_util import JWTGenerator
 from app.utils.respons_util import make_error_response
-from app.utils.enum_util import APIStatusCode
+from app.utils.enum_util import APIStatusCode, LoginState
 from app.utils.email_util import send_verify_email
 from app.models import Account
 from app.database import db
@@ -54,13 +54,14 @@ def login_required(func):
     def wrapper(*args, **kwargs):
         login_state = check_login()
 
-        if login_state == -1:
+        if login_state == LoginState.TokenMiss:
             return make_error_response(APIStatusCode.NotLogin, reason='user has not token')
-        if login_state == -2:
+        if login_state == LoginState.UserNotFound:
             return make_error_response(APIStatusCode.NotLogin, reason='user not found')
+        if login_state == LoginState.NotVerify:
+            return make_error_response(APIStatusCode.NotLogin, reason='user not verified')
 
         return func(*args, **kwargs)
-
     return wrapper
 
 
@@ -69,11 +70,13 @@ def admin_required(func):
     def wrapper(*args, **kwargs):
         login_state = check_login(admin=True)
 
-        if login_state == -1:
+        if login_state == LoginState.TokenMiss:
             return make_error_response(APIStatusCode.NotLogin, reason='user has not token')
-        if login_state == -2:
+        if login_state == LoginState.UserNotFound:
             return make_error_response(APIStatusCode.NotLogin, reason='user not found')
-        if login_state == -3:
+        if login_state == LoginState.NotVerify:
+            return make_error_response(APIStatusCode.NotLogin, reason='user not verified')
+        if login_state != LoginState.AdminSucess:
             return make_error_response(APIStatusCode.NotGrant, reason='user has no permission')
 
         return func(*args, **kwargs)
@@ -90,20 +93,23 @@ def get_user_by_token():
     return user
 
 
-def check_login(admin=False) -> int:
+def check_login() -> LoginState:
     token_info = _get_token_detail()
     if token_info is None:
-        return -1
+        return LoginState.TokenMiss
 
     user: Account = Account.query.filter(
         Account.id == token_info['user_id']
     ).first()
     if user is None:
-        return -2
-    if admin:
-        if user.permission != 1:
-            return -3
-    return 0
+        return LoginState.UserNotFound
+    if user.permission == 1:
+        return LoginState.AdminSucess
+    setting: dict = current_app.config["setting"]
+    if setting["mail"]["enable"]:
+        if user.mail_verify == 0:
+            return LoginState.NotVerify
+    return LoginState.UserSuccess
 
 
 def _get_token_detail():
