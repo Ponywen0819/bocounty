@@ -34,16 +34,7 @@ def build_email(setting: dict, user: Account, code: str) -> MIMEMultipart:
     email["from"] = "Bocountry@noreply.me"
     email["to"] = (setting.get("pattern") % user.student_id)
 
-    with open("./static/logo.png", "rb") as f:
-        img_content = f.read()
-
-    mime_img = MIMEImage(img_content, name="logo.png")
-    mime_img.add_header("Content-ID", f"<{mime_img.get_filename()}>")
-
     email.attach(payload=build_html(user, code))
-    # email.set_payload(payload=build_html(user, code=code), charset="utf-8")
-    # email.attach(mime_img)
-
     return email
 
 
@@ -54,6 +45,6 @@ def build_html(user: Account, code) -> MIMEText:
         html = f.read()
 
     html = html.replace("{{ user_name }}", user.name)
-    html = html.replace("{{ host }}", user.name)
+    html = html.replace("{{ host }}", current_app.config["setting"]["host"])
     html = html.replace("{{ code }}", code)
     return MIMEText(html, 'html', 'utf-8')
