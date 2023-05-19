@@ -5,7 +5,8 @@ import hashlib
 import uuid
 from app.utils.jwt_util import JWTGenerator
 from app.utils.respons_util import make_error_response
-from app.utils.enum_util import APIStatusCode
+from app.utils.enum_util import APIStatusCode, LoginState
+from app.utils.auth_util import register, check_login
 
 from flask import Blueprint, jsonify, make_response, Response, request, current_app
 
@@ -16,59 +17,30 @@ auth_api = Blueprint('auth_api', __name__)
 
 
 @auth_api.route("/Register", methods=['POST'])
-def register():
-    """
-        註冊使用者並且確認Email是否重複
-        tags:
-            - Register
-        produces:
-            - application/json
-        parameters:
-            - name: str
-            - email: str
-            - password: str
-    """
+def register_route():
     request_json: dict = request.json
     if "student_id" not in request_json.keys():
         return make_error_response(APIStatusCode.Wrong_Format, reason="missing 'student_id' argument!")
+    student_id = request_json["student_id"]
 
     if "name" not in request_json.keys():
         return make_error_response(APIStatusCode.Wrong_Format, reason="missing 'name' argument!")
+    user_name = request_json["name"]
 
     if "password" not in request_json.keys():
         return make_error_response(APIStatusCode.Wrong_Format, reason="missing 'password' argument!")
+    user_passwd = request_json["password"]
 
-    # 確認帳號使否重複
-    user_count = Account.query.filter(
-        Account.student_id == request.json["student_id"]
-    ).count()
+    user_passwd = hashlib.sha256(user_passwd.encode("utf-8")).hexdigest()
 
-    if user_count != 0:
-        return jsonify({
-            'cause': 101
-        })
+    user: Account = register(student_id, user_name, user_passwd)
 
-    account_info = request.json
-    account_info['password'] = hashlib.sha256(request.json['password'].encode("utf-8")).hexdigest()
+    if user == None:
+        return make_error_response(APIStatusCode.Wrong_Format, reason="Account is already exsit!")
 
-    # 插入新的帳號
-    new_id = uuid.uuid4().hex
-
-    new_account = Account(
-        id=new_id,
-        student_id=account_info['student_id'],
-        name=account_info['name'],
-        password=account_info['password']
-    )
-    db.session.add(new_account)
-    db.session.commit()
-
-    # token = factory.JWTGenerator.generate_token({"user_id": new_id})
     res = make_response(json.dumps({"cause": 0}))
-
     token_setter(name="User_Token", respond=res,
-                 payload={"user_id": new_id})
-    # res.set_cookie("User_Token", token, expires=time.time() + 60 * 60)
+                 payload={"user_id": user.id})
     return res
 
 
@@ -80,20 +52,25 @@ def login():
     if "password" not in auth_info.keys():
         return make_error_response(APIStatusCode.Wrong_Format, reason="missing 'password' argument!")
 
-    auth_info['password'] = hashlib.sha256(request.json['password'].encode("utf-8")).hexdigest()
+    auth_info['password'] = hashlib.sha256(
+        request.json['password'].encode("utf-8")).hexdigest()
     # 確認有沒有此account
     user: Account = Account.query.filter(
         Account.student_id == auth_info['student_id'],
         Account.password == auth_info['password']
     ).first()
 
-    if user is not None:
+    setting: dict = current_app.config["setting"]
+    if user is None:
+        return make_error_response(APIStatusCode.WrongLoginInfo, reason='wrong password or id!')
+    elif setting["mail"]["enable"]:
+        if user.mail_verify == 0:
+            return make_error_response(APIStatusCode.NotVerify, reason="Account not verified!")
+    else:
         res = make_response(json.dumps({"status": 0}))
         token_setter(name="User_Token", respond=res,
                      payload={"user_id": user.id})
         return res
-    else:
-        return make_error_response(APIStatusCode.WrongLoginInfo, reason='wrong password or id!')
 
 
 @auth_api.route("/Loginadmin", methods=['POST'])
@@ -109,7 +86,8 @@ def loginadmin():
             - application/json
     """
     auth_info = request.json
-    auth_info['password'] = hashlib.sha256(request.json['password'].encode("utf-8")).hexdigest()
+    auth_info['password'] = hashlib.sha256(
+        request.json['password'].encode("utf-8")).hexdigest()
     # 確認有沒有此account
     user: Account = Account.query.filter(
         Account.student_id == auth_info['student_id'],

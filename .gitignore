@@ -25,3 +25,7 @@ package-lock.json
 .python-version
 
 .vscode/
+
+test.py
+
+setting.json

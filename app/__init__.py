@@ -1,15 +1,19 @@
 from flask import Flask, render_template, redirect
-from flask_socketio import SocketIO
+# from flask_socketio import SocketIO
 
-socket = SocketIO(logger=True, engineio_logger=True, manage_session=False)
+# socket = SocketIO(logger=True, engineio_logger=True, manage_session=False)
 
 
 def create_app(config_filename=None):
+
+    # initial basic setting
+
     main = Flask(__name__, template_folder='./template', static_folder='./src')
     if config_filename is None:
         main.config.from_pyfile('config.py')
     else:
         main.config.from_pyfile(config_filename)
+
     from app.utils.setting_util import SettingUtil
     setter = SettingUtil(main.config)
     main.config["setting"] = setter.load_setting()
@@ -17,6 +21,8 @@ def create_app(config_filename=None):
 
     from app.utils.jwt_util import JWTGenerator
     main.config['jwt_gen']: JWTGenerator = JWTGenerator()
+
+    # initial database
 
     from app.database import db, create_db
     db.init_app(main)
@@ -44,11 +50,11 @@ def create_app(config_filename=None):
 
     @main.route("/test")
     def test():
-        user = Account.query.all()
-        # send_verify_email(user)
+        user = Account.query.first()
+        send_verify_email(user)
         print(user)
         return "", 200
 
-    from .websocket import chat
-    socket.init_app(main)
+    # from .websocket import chat
+    # socket.init_app(main)
     return main
