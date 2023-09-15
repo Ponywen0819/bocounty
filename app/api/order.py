@@ -207,6 +207,9 @@ def del_order(id):
 
     if order is None:
         return make_error_response(APIStatusCode.InstanceNotExist, reason="The order with given id is not exist!")
+    elif user.id == 1:
+        db.session.delete(order)
+        db.session.commit()
     elif order.owner_id != user.id:
         return make_error_response(APIStatusCode.InvalidAccess, reason="Access others Order!")
     else:

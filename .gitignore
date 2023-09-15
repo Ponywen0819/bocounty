@@ -15,12 +15,7 @@ venv/
 
 /storage/pool
 
-
-bocountry.sqlite
-
 package-lock.json
-
-./setting.json
 
 .python-version
 
@@ -28,4 +23,4 @@ package-lock.json
 
 test.py
 
-setting.json
+bocountry.sqlite

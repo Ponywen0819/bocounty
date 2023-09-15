@@ -1,6 +1,7 @@
 import jwt
 import secrets
-from flask import Config
+from app.utils.respons_util import no_permission
+
 
 
 class JWTGenerator:
@@ -22,4 +23,7 @@ class JWTGenerator:
             return False
 
     def get_token_detail(self, token: str) -> dict:
-        return jwt.decode(token, self.secret_key, algorithms=['HS256'])
+        try:
+            return jwt.decode(token, self.secret_key, algorithms=['HS256'])
+        except jwt.DecodeError:
+            raise no_permission()

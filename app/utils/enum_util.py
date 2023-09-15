@@ -18,15 +18,6 @@ class APIStatusCode(Enum):
     InstanceNotExist: Code = Code(http_code=200, api_code=206)
     AlreadyExec: Code = Code(http_code=200, api_code=207)
     InvalidAccess: Code = Code(http_code=200, api_code=208)
-    NotVerify: Code = Code(http_code=401, api_code=209)
-
-
-class LoginState(Enum):
-    UserSuccess: int = 0
-    AdminSucess: int = 1
-    TokenMiss: int = 2
-    NotVerify: int = 3
-    UserNotFound: int = 4
 
 
 class OrderListCode(Enum):

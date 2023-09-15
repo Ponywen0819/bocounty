@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer, ForeignKey, DATETIME
+from sqlalchemy import Column, String, Integer, ForeignKey, DATETIME, BLOB
 from app.database import db
 
 
@@ -9,7 +9,7 @@ class Account(db.Model):
     password = Column(String, nullable=False)
     bocoin = Column(Integer, nullable=False, default=0)
     intro = Column(String, nullable=False, default='')
-    mail_verify = Column(Integer, nullable=False, default=0)
+    mail_verify = Column(String, nullable=False, default=0)
     permission = Column(Integer, nullable=False, default=0)
 
 
@@ -17,6 +17,7 @@ class Item(db.Model):
     id = Column(String, primary_key=True, nullable=False)
     name = Column(String, nullable=False)
     photo = Column(String, nullable=False)
+    # photo = Column(BLOB, nullable=False)
     type = Column(Integer, nullable=False)
 
 
@@ -28,7 +29,7 @@ class OwnItem(db.Model):
 
 class PickedItem(db.Model):
     user_id = Column(ForeignKey(Account.id), nullable=False, primary_key=True)
-    item_id = Column(ForeignKey(Item.id), nullable=False)
+    item_id = Column(ForeignKey(Item.id), nullable=False, primary_key=True)
 
 
 class Order(db.Model):
@@ -75,3 +76,20 @@ class Notification(db.Model):
     mention_id = Column(ForeignKey(Account.id))
     chatroom_id = Column(ForeignKey(Involve.chatroom_id))
     due_time = Column(String)
+
+
+class CouponType(db.Model):
+    raw_id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String, nullable=False)
+    describe = Column(String, nullable=False)
+    price = Column(Integer, nullable=False)
+    count = Column(Integer, nullable=False)
+    start_time = Column(String, nullable=False)
+    close_time = Column(String, nullable=False)
+    publisher = Column(ForeignKey(Account.id))
+
+
+class Coupon(db.Model):
+    raw_id = Column(Integer, primary_key=True, autoincrement=True)
+    type = Column(ForeignKey(CouponType.raw_id))
+    owner_id = Column(ForeignKey(Account.id))

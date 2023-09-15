@@ -40,7 +40,8 @@ class CreateOrderPayload:
         return datetime.fromisoformat(self.close_time)
 
     @property
-    def get_exec_time(self) -> datetime | None:
+    def get_exec_time(self) -> datetime:
+    # def get_exec_time(self) -> datetime | None:
         return None if self.exec_time == 'None' else datetime.fromisoformat(self.exec_time)
 
 
@@ -60,7 +61,6 @@ def verify_create_form(func):
 
         if request_json is None:
             return make_error_response(APIStatusCode.Wrong_Format, reason="request body isn't exist")
-
         try:
             payload = CreateOrderPayload(**request_json)
         except TypeError:

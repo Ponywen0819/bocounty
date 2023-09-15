@@ -11,8 +11,8 @@ class StorgeCode(Enum):
     POOL = 'pool'
     ITEM = 'item'
 
-
-def storage_photo(raw_data: str, code: StorgeCode) -> str | None:
+def storage_photo(raw_data: str, code: StorgeCode) -> str:
+# def storage_photo(raw_data: str, code: StorgeCode) -> str | None:
     split = re.split(r'[,;]\s*', raw_data)
     if len(split) != 3:
         return None

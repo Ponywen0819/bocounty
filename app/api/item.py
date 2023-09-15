@@ -62,35 +62,52 @@ def draw_cards(*args, **kwargs):
         filter(Pool.id == pool_id)
 
     picked_items = []
-    index_max = len(items) - 1
+    # index_max = len(items) - 1
+    index_max = items.count() - 1
     times = 1 if type == DrawType.single else 10
-    now_time = get_now()
-    for i in range(times):
-        picked_index = random.randint(0, index_max)
-        picked_item: Item = items[picked_index]
-        picked_items.append(picked_item)
 
-        own_item_count = OwnItem.query.filter(
-            OwnItem.user_id == user.id,
-            OwnItem.item_id == picked_item.id
-        ).count()
-        if own_item_count == 0:
-            db.session.add(OwnItem(
-                user_id=user.id,
-                item_id=picked_item.id,
-                get_time=str(now_time)
-            ))
-    db.session.commit()
+    picked_coin = 0
+    if times == 1:
+        picked_coin = 10
+    else:
+        picked_coin = 90
 
-    picked_item_info = [
-        dict(zip(['id', 'name', 'photo'], [row.id, row.name, row.photo]))
-        for row in picked_items
-    ]
+    if user.bocoin > picked_coin:
+        user.bocoin = user.bocoin - picked_coin
 
-    return jsonify({
-        "status": 0,
-        "list": picked_item_info
-    })
+        now_time = get_now()
+        for i in range(times):
+            picked_index = random.randint(0, index_max)
+            picked_item: Item = items[picked_index]
+            picked_items.append(picked_item)
+
+            own_item_count = OwnItem.query.filter(
+                OwnItem.user_id == user.id,
+                OwnItem.item_id == picked_item.id
+            ).count()
+            if own_item_count == 0:
+                db.session.add(OwnItem(
+                    user_id=user.id,
+                    item_id=picked_item.id,
+                    get_time=str(now_time)
+                ))
+        db.session.commit()
+        picked_item_info = [
+            dict(zip(['id', 'name', 'photo'], [row.id, row.name, row.photo]))
+            for row in picked_items
+        ]
+
+        return jsonify({
+            "status": 0,
+            "list": picked_item_info
+        })
+
+    else:
+        user.bocoin = user.bocoin
+        return jsonify({
+            "status": 0,
+            "list": []
+        })
 
 
 @item_api.route('/listPool', methods=['GET'])

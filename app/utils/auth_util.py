@@ -1,42 +1,22 @@
+from flask import current_app, request, abort, jsonify
 from app.utils.jwt_util import JWTGenerator
-from app.utils.respons_util import make_error_response
-from app.utils.enum_util import APIStatusCode, LoginState
-from app.utils.email_util import send_verify_email
+from app.utils.respons_util import make_error_response, no_permission
+from app.database.util import get
+from app.utils.enum_util import APIStatusCode
 from app.models import Account
-from app.database import db
-from flask import current_app, request, abort, jsonify, Flask
 from functools import wraps
-import threading
-from uuid import uuid4
 
 
-def register(student_id: str, name: str, password: str) -> Account:
-    user_count = Account.query.filter(
-        Account.student_id == student_id
-    ).count()
-    if user_count != 0:
-        return None
+def get_login_user() -> dict:
+    token: str = request.cookies.get("User_Token")
+    jwt_util = JWTGenerator()
+    jwt_data = jwt_util.get_token_detail(token)
+    users = get('account', jwt_data)
 
-    # 插入新的帳號
-    new_id = uuid4().hex
+    if len(users) == 0:
+        no_permission()
 
-    new_user = Account(
-        id=new_id,
-        student_id=student_id,
-        name=name,
-        password=password
-    )
-    db.session.add(new_user)
-    db.session.commit()
-
-    setting: dict = current_app.config["setting"]
-    if setting["mail"]["enable"]:
-        thread = FlaskThread(
-            target=send_verify_email, args=[new_user.student_id, new_user.name])
-        thread.start()
-
-    return new_user
-
+    return users[0]
 
 def verify_jwt(func):
     @wraps(func)
@@ -54,14 +34,13 @@ def login_required(func):
     def wrapper(*args, **kwargs):
         login_state = check_login()
 
-        if login_state == LoginState.TokenMiss:
+        if login_state == -1:
             return make_error_response(APIStatusCode.NotLogin, reason='user has not token')
-        if login_state == LoginState.UserNotFound:
+        if login_state == -2:
             return make_error_response(APIStatusCode.NotLogin, reason='user not found')
-        if login_state == LoginState.NotVerify:
-            return make_error_response(APIStatusCode.NotLogin, reason='user not verified')
 
         return func(*args, **kwargs)
+
     return wrapper
 
 
@@ -70,13 +49,11 @@ def admin_required(func):
     def wrapper(*args, **kwargs):
         login_state = check_login(admin=True)
 
-        if login_state == LoginState.TokenMiss:
+        if login_state == -1:
             return make_error_response(APIStatusCode.NotLogin, reason='user has not token')
-        if login_state == LoginState.UserNotFound:
+        if login_state == -2:
             return make_error_response(APIStatusCode.NotLogin, reason='user not found')
-        if login_state == LoginState.NotVerify:
-            return make_error_response(APIStatusCode.NotLogin, reason='user not verified')
-        if login_state != LoginState.AdminSucess:
+        if login_state == -3:
             return make_error_response(APIStatusCode.NotGrant, reason='user has no permission')
 
         return func(*args, **kwargs)
@@ -89,27 +66,24 @@ def get_user_by_token():
     user: Account = Account.query.filter(
         Account.id == token_info['user_id']
     ).first()
-
+    # print(token_info)
     return user
 
 
-def check_login() -> LoginState:
+def check_login(admin=False) -> int:
     token_info = _get_token_detail()
     if token_info is None:
-        return LoginState.TokenMiss
+        return -1
 
     user: Account = Account.query.filter(
         Account.id == token_info['user_id']
     ).first()
     if user is None:
-        return LoginState.UserNotFound
-    if user.permission == 1:
-        return LoginState.AdminSucess
-    setting: dict = current_app.config["setting"]
-    if setting["mail"]["enable"]:
-        if user.mail_verify == 0:
-            return LoginState.NotVerify
-    return LoginState.UserSuccess
+        return -2
+    if admin:
+        if user.permission != 1:
+            return -3
+    return 0
 
 
 def _get_token_detail():
@@ -123,16 +97,5 @@ def _get_token_detail():
     if not jwt_gen.check_token_valid(token):
         print('Token not valid')
         return None
-
+    # print(request.cookies.get("User_Token"))
     return jwt_gen.get_token_detail(token)
-
-
-class FlaskThread(threading.Thread):
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-        # type: ignore[attr-defined]
-        self.app: Flask = current_app._get_current_object()
-
-    def run(self) -> None:
-        with self.app.app_context():
-            super().run()
