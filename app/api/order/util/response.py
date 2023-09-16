@@ -16,3 +16,9 @@ def wrong_format():
     raise HTTPException(response=make_response(jsonify({
         "message": "wrong data format"
     }), 400))
+
+
+def date_in_past():
+    raise HTTPException(response=make_response(jsonify({
+        "message": "date is in the past"
+    }), 400))

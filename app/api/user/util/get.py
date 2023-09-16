@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from app.database.util import get
-from app.utils.respons_util import not_found
+from .respons import not_found
 from .user import User
 
 

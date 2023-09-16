@@ -16,7 +16,7 @@ def missing_required():
 
 def not_found():
     raise HTTPException(response=make_response(jsonify({
-        "message": "user no verified"
+        "message": "user no found"
     }), 401))
 
 
