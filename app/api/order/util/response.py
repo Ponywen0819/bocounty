@@ -22,3 +22,15 @@ def date_in_past():
     raise HTTPException(response=make_response(jsonify({
         "message": "date is in the past"
     }), 400))
+
+
+def close_after_exec():
+    raise HTTPException(response=make_response(jsonify({
+        "message": "close order before execute"
+    }), 400))
+
+def no_enough_coin():
+    raise HTTPException(response=make_response(jsonify({
+        "message": "coin not enough"
+    }), 403))
+

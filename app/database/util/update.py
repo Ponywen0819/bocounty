@@ -14,5 +14,3 @@ def update(table: str, condition: dict, value: dict):
         query_string += f"WHERE {get_condition_string(condition)} "
 
     cursor.execute(query_string)
-
-    db.commit()

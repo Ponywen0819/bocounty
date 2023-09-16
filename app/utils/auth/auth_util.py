@@ -9,23 +9,13 @@ def required_login(required_admin=False):
     def generator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
-            user_token: str = request.cookies['user_token']
-            if user_token is None:
-                not_login()
-
-            try:
-                decoded = jwt_decode(user_token)
-            except:
-                not_login()
-
+            decoded = get_jwt_data()
             id = decoded.get("id")
-            users = get('account', {
-                "id": id
-            })
-            if len(users) != 1:
-                not_login()
+
+            user = get_user(id)
+
             if required_admin:
-                role = users[0].get("role")
+                role = user.get("role")
                 if role is None or role == 0:
                     no_permission()
             return func(*args, **kwargs)
@@ -33,3 +23,26 @@ def required_login(required_admin=False):
         return wrapper
 
     return generator
+
+
+def get_jwt_data() -> dict:
+    user_token: str = request.cookies['user_token']
+    if user_token is None:
+        not_login()
+
+    try:
+        decoded = jwt_decode(user_token)
+    except:
+        not_login()
+
+    return decoded
+
+
+def get_user(id: str):
+    users = get('account', {
+        "id": id
+    })
+    if len(users) != 1:
+        not_login()
+
+    return users[0]

@@ -8,7 +8,6 @@ class CreatePayload:
     intro: str
     price: int
     close_time = str
-    exec_time: datetime = None
 
 
 @dataclass
@@ -23,5 +22,3 @@ class Order:
     close_time: datetime
     exec_time: datetime = None
 
-    def __post_init__(self):
-        self.close_time = datetime.fromisoformat(self.close_time)

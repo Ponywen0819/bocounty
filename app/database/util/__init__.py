@@ -12,6 +12,7 @@ def get_db() -> sqlite3.Connection:
 
 def disconnect(sender, **extra):
     db: sqlite3.Connection = g.setdefault("_database", sqlite3.connect(DB_PATH))
+    db.commit()
     db.close()
 
 
