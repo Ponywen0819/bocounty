@@ -6,11 +6,11 @@ def get(table: str, condition: dict = None) -> list[dict]:
     cursor = get_db().cursor()
 
     info_query = cursor.execute(f"""
-        PRAGMA table_info({table})    
+        PRAGMA table_info('{table}')    
     """)
 
     column_names = [column_info[1] for column_info in info_query]
-    query_string = f"SELECT * FROM {table} "
+    query_string = f"SELECT * FROM '{table}' "
 
     if condition is not None:
         query_string += f"WHERE {get_condition_string(condition)}"

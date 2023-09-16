@@ -10,7 +10,9 @@ user_api = Blueprint("user_api", __name__, url_prefix="/user")
 @required_login(required_admin=True)
 def get_list():
     users = get_user_list()
-    return jsonify(users)
+    return success({
+        "users": jsonify(users)
+    })
 
 
 @user_api.route("/<string:id>", methods=["GET"])

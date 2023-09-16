@@ -46,3 +46,9 @@ def get_user(id: str):
         not_login()
 
     return users[0]
+
+
+def get_login_user():
+    data = get_jwt_data()
+    user = get_user(data.get('id'))
+    return user
