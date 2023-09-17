@@ -13,7 +13,7 @@ order_api = Blueprint("order_api", __name__, url_prefix="/order")
 def list():
     orders = get_order_list()
     return success({
-        "orders": orders
+        "data": orders
     })
 
 
@@ -23,7 +23,7 @@ def get(id):
     order = get_order(id)
 
     return success({
-        "order": order
+        "data": order
     })
 
 

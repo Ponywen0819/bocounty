@@ -4,7 +4,7 @@ from app.utils.auth.auth_util import required_login
 from .util.validate import validate_create_payload
 from .util.formatter import format_create_payload
 from .util.create import create_report
-from .util.get import get_report_list
+from .util.get import get_report_list, get_report
 
 report_api = Blueprint("report_api", __name__, url_prefix='/report')
 
@@ -14,7 +14,16 @@ report_api = Blueprint("report_api", __name__, url_prefix='/report')
 def get_list():
     orders = get_report_list()
     return success({
-        "reports": orders
+        "data": orders
+    })
+
+
+@report_api.route("/<string:id>", methods=["GET"])
+@required_login(required_admin=True)
+def get(id):
+    order = get_report(id)
+    return success({
+        "data": order
     })
 
 
