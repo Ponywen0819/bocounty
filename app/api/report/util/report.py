@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, fields
 from enum import Enum, auto
 
 
@@ -14,4 +14,22 @@ class Type(Enum):
 class CreateReport:
     type: int
 
+    def __post_init__(self):
+        type_checker(self)
 
+
+@dataclass
+class Report:
+    id: str
+    type: int
+    order_id: str
+    publisher_id: str
+    time: str
+
+def type_checker(obj):
+    for field in fields(obj):
+        instance = getattr(obj, field.name)
+        if instance is None:
+            continue
+        if type(getattr(obj, field.name)) != field.type:
+            raise ValueError
