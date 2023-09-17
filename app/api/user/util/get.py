@@ -11,13 +11,9 @@ def get_user_list() -> list:
     return [User(**data) for data in datas]
 
 
-def get_user(id: str) -> User | None:
+def get_user(student_id: str) -> User | None:
     data = get("account", {
-        "id": id
+        "student_id": student_id
     })
 
-    if len(data) == 0:
-        not_found()
-        return
-    else:
-        return User(**data[0])
+    return User(**data[0])
