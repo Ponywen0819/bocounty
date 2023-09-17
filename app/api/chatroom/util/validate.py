@@ -15,6 +15,10 @@ def validate_assign(chatroom_id: str):
     _validate_owner(chatroom_id)
 
 
+def validate_member(chatroom_id: str):
+    _validate_chatroom_exist(chatroom_id)
+
+
 def _validate_conflict(id):
     user = get_login_user()
 
@@ -69,7 +73,7 @@ def _validate_owner(chatroom_id: str):
 
     orders = get('order', {
         "owner_id": user.get('id'),
-        "order_id": chatroom_list[0].get('order_id')
+        "id": chatroom_list[0].get('order_id')
     })
 
     if len(orders) != 1:

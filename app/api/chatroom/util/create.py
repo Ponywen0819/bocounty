@@ -3,13 +3,11 @@ from app.database.util import create, get
 from app.utils.auth.auth_util import get_login_user
 
 
-def create_chatroom():
-    payload: dict = request.json
+def create_chatroom(payload: dict):
     create("chatroom", payload)
 
 
-def initial_member():
-    payload: dict = request.json
+def initial_member(payload: dict):
     order = get('order', {
         "id": payload.get('order_id')
     })[0]
