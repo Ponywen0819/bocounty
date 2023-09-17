@@ -28,3 +28,6 @@ def register_blueprints(app: Flask):
 
     from app.api.chatroom.route import chatroom_api
     app.register_blueprint(chatroom_api)
+
+    from app.api.message.route import message_api
+    app.register_blueprint(message_api)
