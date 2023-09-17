@@ -11,6 +11,10 @@ def get_current():
     return current
 
 
+def date2str(date: datetime):
+    return date.isoformat(timespec="minutes")
+
+
 def str2date(string: str):
     date = datetime.fromisoformat(string)
     date = date.replace(second=0, microsecond=0, tzinfo=get_taipei_timezone())

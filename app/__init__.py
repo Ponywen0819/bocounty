@@ -22,3 +22,6 @@ def register_blueprints(app: Flask):
 
     from app.api.order import order_api
     app.register_blueprint(order_api)
+
+    from app.api.report.route import report_api
+    app.register_blueprint(report_api)
