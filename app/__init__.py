@@ -17,10 +17,10 @@ def register_blueprints(app: Flask):
     from app.api.auth import auth_api
     app.register_blueprint(auth_api)
 
-    from app.api.user import user_api
+    from app.api.user.route import user_api
     app.register_blueprint(user_api)
 
-    from app.api.order import order_api
+    from app.api.order.route import order_api
     app.register_blueprint(order_api)
 
     from app.api.report.route import report_api

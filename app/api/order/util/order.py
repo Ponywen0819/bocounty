@@ -10,12 +10,7 @@ class CreatePayload:
     exec_time: str = None
 
     def __post_init__(self):
-        for field in fields(self):
-            instance = getattr(self, field.name)
-            if instance is None:
-                continue
-            if type(getattr(self, field.name)) != field.type:
-                raise ValueError
+        type_checker(self)
 
 
 @dataclass
@@ -26,12 +21,7 @@ class UpdatePayload:
     exec_time: str = None
 
     def __post_init__(self):
-        for field in fields(self):
-            instance = getattr(self, field.name)
-            if instance is None:
-                continue
-            if type(getattr(self, field.name)) != field.type:
-                raise ValueError
+        type_checker(self)
 
 
 @dataclass
@@ -47,9 +37,13 @@ class Order:
     exec_time: str
 
     def __post_init__(self):
-        for field in fields(self):
-            instance = getattr(self, field.name)
-            if instance is None:
-                continue
-            if type(getattr(self, field.name)) != field.type:
-                raise ValueError
+        type_checker(self)
+
+
+def type_checker(obj):
+    for field in fields(obj):
+        instance = getattr(obj, field.name)
+        if instance is None:
+            continue
+        if type(getattr(obj, field.name)) != field.type:
+            raise ValueError

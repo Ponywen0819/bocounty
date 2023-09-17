@@ -1,56 +1,65 @@
-from flask import Blueprint, jsonify
-from .util import create_order, get_order_list, get_order
-from .util.update import update_order
+from flask import Blueprint
+from .util.validate import validate_create_payload, validate_get, validate_delete
+from .util.formatter import format_create_payload
+from .util.get import get_open_order, get_enrolled_order, get_order
+from .util.create import create_order
 from .util.delete import delete_order
+from .util.checker import check_order
+
+
 from app.utils.response import success
 from app.utils.auth.auth_util import required_login
 
 order_api = Blueprint("order_api", __name__, url_prefix="/order")
 
 
-@order_api.route("/", methods=["GET"])
+@order_api.route("/", methods=["POST"])
 @required_login()
-def list():
-    orders = get_order_list()
+def create():
+    check_order()
+    validate_create_payload()
+
+    format_create_payload()
+
+    create_order()
+
+    return success()
+
+
+@order_api.route("/open", methods=["GET"])
+@required_login()
+def list_open():
+    check_order()
+    orders = get_open_order()
+
     return success({
         "data": orders
     })
 
 
-@order_api.route("/<string:id>", methods=["GET"])
+@order_api.route("/enrolled", methods=["GET"])
 @required_login()
-def get(id):
-    order = get_order(id)
+def list_enrolled():
+    check_order()
+    orders = get_enrolled_order()
+    return success({
+        "data": orders
+    })
 
+
+@order_api.route("/<string:order_id>", methods=["GET"])
+@required_login()
+def get(order_id: str):
+    validate_get(order_id)
+    order = get_order(order_id)
     return success({
         "data": order
     })
 
 
-@order_api.route("/", methods=["POST"])
+@order_api.route("/<string:order_id>", methods=["DELETE"])
 @required_login()
-def create():
-    new_id = create_order()
-    return success({
-        "id": new_id
-    })
-
-
-@order_api.route("/<string:id>", methods=["PUT"])
-@required_login()
-def edit(id):
-    get_order(id)
-    update_order(id)
-
+def delete(order_id: str):
+    validate_delete(order_id)
+    delete_order(order_id)
     return success()
-
-
-@order_api.route("/<string:id>", methods=["DELETE"])
-@required_login(required_admin=True)
-def delete(id):
-    get_order(id)
-    delete_order(id)
-    return success()
-
-
-

@@ -1,9 +1,6 @@
-from app.database.util import delete, get
-from .validate import validate_permission
+from app.database.util import delete
 
-
-def delete_order(id: str):
-    validate_permission(id)
+def delete_order(order_id: str):
     delete('order', {
-        "id": id
+        "id": order_id
     })

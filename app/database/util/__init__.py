@@ -18,7 +18,7 @@ def disconnect(sender, **extra):
 
 appcontext_tearing_down.connect(disconnect)
 
-from .get import get
+from .get import get, get_from_raw
 from .create import create
 from .delete import delete
 from .update import update

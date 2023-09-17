@@ -1,7 +1,7 @@
 from app.database.util import get
 from .order import Order
-from .response import not_found, conflict_id
-from werkzeug.exceptions import InternalServerError
+from app.database.util import get_from_raw
+from app.utils.auth.auth_util import get_login_user
 
 
 def get_order_list():
@@ -9,15 +9,38 @@ def get_order_list():
     return [Order(**order) for order in orders]
 
 
-def get_order(id):
-    orders = get('order', {
-        "id": id
+def get_open_order():
+    user = get_login_user()
+
+    orders = get_from_raw('order', f"""
+        SELECT * FROM 'order'
+        WHERE status = 0 AND owner_id != '{user.get('id')}'
+    """)
+
+    return [Order(**order) for order in orders]
+
+
+def get_enrolled_order():
+    user = get_login_user()
+    orders = get('order_enrolled', {
+        "account_id": user.get('id')
     })
 
-    if len(orders) < 1:
-        not_found()
+    return [Order(
+        id=data['id'],
+        status=data['status'],
+        title=data['title'],
+        intro=data['intro'],
+        price=data['price'],
+        owner_id=data['owner_id'],
+        start_time=data['start_time'],
+        close_time=data['close_time'],
+        exec_time=data['exec_time']) for data in orders]
 
-    if len(orders) != 1:
-        conflict_id()
 
-    return Order(**orders[0])
+def get_order(order_id: str):
+    order = get('order', {
+        "id": order_id
+    })[0]
+
+    return Order(**order)
