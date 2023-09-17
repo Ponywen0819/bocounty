@@ -39,15 +39,16 @@ def create():
 @order_api.route("/<string:id>", methods=["PUT"])
 @required_login()
 def edit(id):
-    order = get_order(id)
+    get_order(id)
     update_order(id)
 
     return success()
 
 
 @order_api.route("/<string:id>", methods=["DELETE"])
+@required_login(required_admin=True)
 def delete(id):
-    order = get_order(id)
+    get_order(id)
     delete_order(id)
     return success()
 
