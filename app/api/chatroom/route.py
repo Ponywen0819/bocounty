@@ -1,7 +1,12 @@
 from flask import Blueprint
 from app.utils.response import success
 from app.utils.auth.auth_util import required_login
-from .util.validate import validate_create_payload, validate_assign, validate_member
+from .util.validate import (
+    validate_create_payload,
+    validate_assign,
+    validate_member,
+    validate_complete
+)
 from .util.formatter import format_create_payload
 from .util.get import get_chatroom_list, get_chatroom_member
 from .util.create import create_chatroom, initial_member
@@ -34,6 +39,7 @@ def creat_chatroom(order_id):
 
 
 @chatroom_api.route("/member/<string:chatroom_id>", methods=["GET"])
+@required_login()
 def get_chatroom_member_api(chatroom_id: str):
     validate_member(chatroom_id)
 
@@ -45,6 +51,7 @@ def get_chatroom_member_api(chatroom_id: str):
 
 
 @chatroom_api.route("/assign/<string:chatroom_id>", methods=["POST"])
+@required_login()
 def assign_chatroom(chatroom_id: str):
     validate_assign(chatroom_id)
 

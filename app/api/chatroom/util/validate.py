@@ -19,6 +19,9 @@ def validate_member(chatroom_id: str):
     _validate_chatroom_exist(chatroom_id)
 
 
+def validate_complete(chatroom_id: str):
+    _validate_chatroom_exist(chatroom_id)
+
 def _validate_conflict(id):
     user = get_login_user()
 

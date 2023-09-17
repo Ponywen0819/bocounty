@@ -29,7 +29,7 @@ def close_after_exec():
 def no_enough_coin():
     raise HTTPException(response=make_response(jsonify({
         "message": "coin not enough"
-    }), 403))
+    }), 402))
 
 
 def no_permission():
