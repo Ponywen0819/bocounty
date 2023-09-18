@@ -1,18 +1,18 @@
-from app.utils.response import missing_required, wrong_format, not_found
-from app.utils.time_util import str2date, get_current
-from app.database.util import get
-
-from .coupon import CreateCoupon
+from .pool import CreatePool
 from flask import request
+from app.utils.response import missing_required, wrong_format
+from app.utils.time_util import get_current, str2date
+
+import base64
 from datetime import datetime
 from .response import date_in_past
 
 
+
 def validate_create_payload():
     payload: dict = request.json
-
     try:
-        CreateCoupon(**payload)
+        CreatePool(**payload)
     except TypeError:
         missing_required()
     except ValueError:
@@ -33,57 +33,32 @@ def validate_close_time():
     _validate_iso_format(close_time)
     _validate_date_correct(close_time)
 
-def validate_count():
+
+def validate_photo():
     payload: dict = request.json
 
-    count = payload.get("count")
-    if count < 1:
-        wrong_format()
+    base64_string = payload.get('photo').split(",")[1]
 
-
-def validate_price():
-    payload: dict = request.json
-
-    price = payload.get("price")
-    if price < 1:
+    try:
+        sb_bytes = bytes(base64_string, 'ascii')
+        if base64.b64encode(base64.b64decode(sb_bytes)) != sb_bytes:
+            raise ValueError
+    except ValueError:
         wrong_format()
 
 
 def validate_name():
     payload: dict = request.json
 
-    name = payload.get("name")
+    name = payload.get('name')
+
     while len(name) > 0:
         if name[0] == " ":
             name = name[1:]
         else:
             break
-
     if name == "":
         wrong_format()
-
-
-def validate_describe():
-    payload: dict = request.json
-
-    describe = payload.get("describe")
-    while len(describe) > 0:
-        if describe[0] == " ":
-            describe = describe[1:]
-        else:
-            break
-
-    if describe == "":
-        wrong_format()
-
-def validate_coupon_exist(coupon_id: str):
-    coupons = get('coupon_type',{
-        "id": coupon_id
-    })
-
-    if len(coupons) != 1:
-        not_found("coupon not found")
-
 
 
 def _validate_iso_format(value: str):
