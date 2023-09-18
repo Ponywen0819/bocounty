@@ -7,7 +7,7 @@ from .util.validate import (
     validate_update_wear,
     validate_item_exist
 )
-from .util.get import get_user_wearing
+from .util.get import get_user_wearing, get_user_own
 from .util.update import update_wear
 
 item_api = Blueprint("item_api", __name__, url_prefix='/item')
@@ -36,7 +36,12 @@ def change_user_wearing_api():
     return success()
 
 
-@item_api.route("/own/<string:student_id>")
+@item_api.route("/own")
 @required_login()
-def get_user_own_api(student_id: str):
-    return success()
+def get_user_own_api():
+
+    items = get_user_own()
+
+    return success({
+        "data": items
+    })
