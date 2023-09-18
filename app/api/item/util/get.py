@@ -7,7 +7,7 @@ def get_user_wearing(student_id: str):
         "student_id": student_id
     })[0]
 
-    user_wears = get('own_item', {
+    user_wears = get('picked_item', {
         "user_id": user.get('id')
     })
 
@@ -18,6 +18,6 @@ def get_user_wearing(student_id: str):
             "id": user_wear.get('item_id')
         })[0]
 
-        res.append(Item(item))
+        res.append(Item(**item))
 
     return res

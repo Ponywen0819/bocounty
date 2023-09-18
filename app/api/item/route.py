@@ -2,8 +2,13 @@ from flask import Blueprint
 from app.utils.auth.auth_util import required_login
 from app.utils.response import success
 
-from .util.validate import validate_get_wear, validate_update_wear
+from .util.validate import (
+    validate_get_wear,
+    validate_update_wear,
+    validate_item_exist
+)
 from .util.get import get_user_wearing
+from .util.update import update_wear
 
 item_api = Blueprint("item_api", __name__, url_prefix='/item')
 
@@ -20,10 +25,13 @@ def get_user_wearing_api(student_id: str):
     })
 
 
-@item_api.route("/wear/<string:student_id>", methods=["PUT"])
+@item_api.route("/wear", methods=["PUT"])
 @required_login()
-def change_user_wearing_api(student_id: str):
-    validate_update_wear(student_id)
+def change_user_wearing_api():
+    validate_update_wear()
+    validate_item_exist()
+
+    update_wear()
 
     return success()
 
