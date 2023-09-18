@@ -27,4 +27,4 @@ def save_photo():
     with open(file_path, 'wb') as f:
         f.write(imgdata)
 
-    payload["photo"] = f"/{file_name}"
+    payload["photo"] = f"/static/{file_name}"
