@@ -1,5 +1,6 @@
-from app.utils.response import missing_required, wrong_format
+from app.utils.response import missing_required, wrong_format, not_found
 from app.utils.time_util import str2date, get_current
+from app.database.util import get
 
 from .coupon import CreateCoupon
 from flask import request
@@ -72,6 +73,15 @@ def validate_describe():
 
     if describe == "":
         wrong_format()
+
+def validate_coupon_exist(coupon_id: str):
+    coupons = get('coupon_type',{
+        "id": coupon_id
+    })
+
+    if len(coupons) != 1:
+        not_found("coupon not found")
+
 
 
 def _validate_iso_format(value: str):
