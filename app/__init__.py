@@ -2,7 +2,7 @@ from flask import Flask
 
 
 def create_app(config_filename=None):
-    main = Flask(__name__, template_folder='./template', static_folder='./public')
+    main = Flask(__name__, template_folder='./template', static_folder='../public', static_url_path="/static")
     if config_filename is None:
         main.config.from_pyfile('config.py')
     else:
@@ -31,3 +31,6 @@ def register_blueprints(app: Flask):
 
     from app.api.message.route import message_api
     app.register_blueprint(message_api)
+
+    from app.api.admin.route import admin_api
+    app.register_blueprint(admin_api)
