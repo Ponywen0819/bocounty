@@ -1,7 +1,8 @@
 from .pool import CreatePool
 from flask import request
-from app.utils.response import missing_required, wrong_format
+from app.utils.response import missing_required, wrong_format, not_found
 from app.utils.time_util import get_current, str2date
+from app.database.util import get
 
 import base64
 from datetime import datetime
@@ -74,3 +75,14 @@ def _validate_date_correct(value: str):
 
     if date < current:
         date_in_past()
+
+
+def validate_pool_exist(pool_id: str):
+    pools = get('pool',{
+        "id": pool_id
+    })
+
+    if len(pools) != 1:
+        not_found('pool not found')
+
+    
