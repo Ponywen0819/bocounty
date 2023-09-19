@@ -1,5 +1,5 @@
 from app.database.util import get, update, delete, get_db
-
+from .chatroom import OrderStatus
 
 def assign_order(chatroom_id: str):
     chatroom = get('chatroom', {
@@ -9,7 +9,7 @@ def assign_order(chatroom_id: str):
     update('order', {
         "id": chatroom.get('order_id')
     }, {
-               "status": 1
+               "status": OrderStatus.IN_PROGRESS.value
            })
 
     cursor = get_db().cursor()
