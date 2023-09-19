@@ -13,3 +13,7 @@ admin_api.register_blueprint(coupon_api)
 from .pool.route import pool_api
 
 admin_api.register_blueprint(pool_api)
+
+from .report.route import report_api
+
+admin_api.register_blueprint(report_api)
