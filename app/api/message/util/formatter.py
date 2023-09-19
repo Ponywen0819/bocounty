@@ -2,6 +2,7 @@ from flask import request
 from app.utils.auth.auth_util import get_login_user
 from app.utils.time_util import get_current, date2str
 from uuid import uuid4
+from time import time
 
 def format_create_payload(id):
     payload:dict = request.json
@@ -12,7 +13,7 @@ def format_create_payload(id):
     payload['chatroom_id'] = id
     payload['content'] = remove_space( payload['content'])
     payload['time'] = date2str(get_current())
-
+    payload['timestamp'] = time()
 
 def remove_space(value: str):
     while len(value) > 0:
