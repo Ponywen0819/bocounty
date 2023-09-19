@@ -10,6 +10,14 @@ class CreatePool:
     def __post_init__(self):
         type_checker(self)
 
+@dataclass
+class UpdatePool:
+    name: str = None
+    photo: str = None
+    close_time: str = None
+
+    def __post_init__(self):
+        type_checker(self)
 
 @dataclass
 class Pool:

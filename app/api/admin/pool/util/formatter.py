@@ -11,4 +11,3 @@ def format_create_payload():
     close_time = payload.get('close_time')
     if close_time is None:
         payload['close_time'] = "None"
-

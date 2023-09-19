@@ -1,4 +1,4 @@
-from .pool import CreatePool
+from .pool import CreatePool, UpdatePool
 from flask import request
 from app.utils.response import missing_required, wrong_format, not_found
 from app.utils.time_util import get_current, str2date
@@ -9,11 +9,20 @@ from datetime import datetime
 from .response import date_in_past
 
 
-
 def validate_create_payload():
     payload: dict = request.json
     try:
         CreatePool(**payload)
+    except TypeError:
+        missing_required()
+    except ValueError:
+        wrong_format()
+
+
+def validate_update_payload():
+    payload: dict = request.json
+    try:
+        UpdatePool(**payload)
     except TypeError:
         missing_required()
     except ValueError:
@@ -28,9 +37,6 @@ def validate_close_time():
     if close_time is None:
         return
 
-    if type(close_time) != str:
-        wrong_format()
-
     _validate_iso_format(close_time)
     _validate_date_correct(close_time)
 
@@ -38,7 +44,12 @@ def validate_close_time():
 def validate_photo():
     payload: dict = request.json
 
-    base64_string = payload.get('photo').split(",")[1]
+    photo = payload.get('photo')
+
+    if photo is None:
+        return
+
+    base64_string = photo.split(",")[1]
 
     try:
         sb_bytes = bytes(base64_string, 'ascii')
@@ -52,6 +63,9 @@ def validate_name():
     payload: dict = request.json
 
     name = payload.get('name')
+
+    if name is None:
+        return
 
     while len(name) > 0:
         if name[0] == " ":
@@ -78,11 +92,9 @@ def _validate_date_correct(value: str):
 
 
 def validate_pool_exist(pool_id: str):
-    pools = get('pool',{
+    pools = get('pool', {
         "id": pool_id
     })
 
     if len(pools) != 1:
         not_found('pool not found')
-
-    
