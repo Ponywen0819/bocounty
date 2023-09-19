@@ -1,6 +1,6 @@
 from flask import request
 from .report import CreateReport, Type
-from .response import self_report
+from .response import self_report, reported
 from app.utils.response import missing_required, wrong_format, not_found
 from app.utils.auth.auth_util import get_login_user
 from app.database.util import get
@@ -47,3 +47,14 @@ def _validate_create_type():
         Type(payload.get("type"))
     except ValueError:
         wrong_format("unknown report type")
+
+
+def validate_not_reported(order_id: str):
+    user = get_login_user()
+    report_list = get('report', {
+        "publisher_id": user.get('id'),
+        "order_id": order_id
+    })
+
+    if len(report_list) != 0:
+        reported()
