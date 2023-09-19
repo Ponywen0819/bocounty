@@ -17,8 +17,8 @@ class Notification:
     publisher_id: str
     receiver_id: str
     content: str
-    name: str
-    timestamp: int
+    title: str
+    timestamp: float
 
     def __post_init__(self):
         type_checker(self)
