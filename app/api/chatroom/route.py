@@ -1,21 +1,31 @@
 from flask import Blueprint
 from app.utils.response import success
+from app.database.model.chatroom import (
+    get_user_chatroom_list,
+    create_chatroom
+)
+from app.database.model.chatroom_member import (
+    get_chatroom_member_by_id
+)
+from app.database.model.account import (
+    get_account_by_member_record
+)
 from app.utils.auth.auth_util import required_login
 from .util.validate import (
     validate_create_payload,
     validate_assign,
     validate_member,
-    validate_complete,
     validate_chatroom_exist,
     validate_is_owner,
     validate_not_owner,
     validate_is_member,
     validate_not_submit,
-    validate_not_finish
+    validate_not_finish,
+    validate_not_recruiting
 )
+
+from .util.initial import initial_member
 from .util.formatter import format_create_payload
-from .util.get import get_chatroom_list, get_chatroom_member
-from .util.create import create_chatroom, initial_member
 from .util.assign import assign_order
 from .util.submit import submit_chatroom
 from .util.notification import send_submit_message, send_confirm_message
@@ -27,7 +37,7 @@ chatroom_api = Blueprint("chatroom_api", __name__, url_prefix='/chatroom')
 @chatroom_api.route("/", methods=["GET"])
 @required_login()
 def get_list():
-    chatroom_list = get_chatroom_list()
+    chatroom_list = get_user_chatroom_list()
 
     return success({
         "data": chatroom_list
@@ -52,10 +62,11 @@ def creat_chatroom(order_id):
 def get_chatroom_member_api(chatroom_id: str):
     validate_member(chatroom_id)
 
-    members = get_chatroom_member(chatroom_id)
+    member_records = get_chatroom_member_by_id(chatroom_id)
+    accounts = get_account_by_member_record(member_records)
 
     return success({
-        "data": members
+        "data": accounts
     })
 
 
@@ -63,6 +74,7 @@ def get_chatroom_member_api(chatroom_id: str):
 @required_login()
 def assign_chatroom(chatroom_id: str):
     validate_assign(chatroom_id)
+    validate_not_recruiting(chatroom_id)
 
     assign_order(chatroom_id)
 

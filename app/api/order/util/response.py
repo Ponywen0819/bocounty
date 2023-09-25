@@ -35,7 +35,7 @@ def no_enough_coin():
 def no_permission():
     raise HTTPException(response=make_response(jsonify({
         "message": "have no permission"
-    }), 403))
+    }), 401))
 
 
 def not_found():

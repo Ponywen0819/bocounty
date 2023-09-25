@@ -17,3 +17,7 @@ admin_api.register_blueprint(pool_api)
 from .report.route import report_api
 
 admin_api.register_blueprint(report_api)
+
+from .order.route import order_api
+
+admin_api.register_blueprint(order_api)

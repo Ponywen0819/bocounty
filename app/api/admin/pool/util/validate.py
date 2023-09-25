@@ -6,7 +6,7 @@ from app.database.util import get
 
 import base64
 from datetime import datetime
-from .response import date_in_past
+from .response import date_in_past, item_in_pool
 
 
 def validate_create_payload():
@@ -98,3 +98,28 @@ def validate_pool_exist(pool_id: str):
 
     if len(pools) != 1:
         not_found('pool not found')
+
+def validate_item_exist(item_id: str):
+    item = get('item',{"id": item_id})
+
+    if len(item) != 1:
+        not_found('item not exist')
+
+def validate_item_in_pool(pool_id: str, item_id: str):
+    pools = get('pool_item', {
+        "pool_id": pool_id,
+        "item_id": item_id
+    })
+
+    if len(pools) != 1:
+        not_found('item not in pool')
+
+
+def validate_item_not_in_pool(pool_id: str, item_id: str):
+    pools = get('pool_item', {
+        "pool_id": pool_id,
+        "item_id": item_id
+    })
+
+    if len(pools) != 0:
+        item_in_pool()

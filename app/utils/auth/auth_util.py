@@ -26,7 +26,7 @@ def required_login(required_admin=False):
 
 
 def get_jwt_data() -> dict:
-    user_token: str = request.cookies['user_token']
+    user_token: str = request.cookies.get('user_token')
     if user_token is None:
         not_login()
 

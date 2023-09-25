@@ -1,39 +1,51 @@
-from app.database.util import update, get
-from app.utils.time_util import get_current, date2str
+from app.database.model.chatroom import (
+    get_chatroom_by_id,
+    update_chatroom_by_id,
+    ChatroomStatus
+)
+from app.database.model.order import (
+    get_order_by_id,
+    update_order_by_id,
+    OrderStatus
+)
+from app.database.model.account import (
+    get_account_by_id,
+    update_account_by_id
+)
+from app.database.model.chatroom_member import (
+    get_chatroom_member_by_id
+)
+from app.utils.time_util import get_current_string
 from app.utils.auth.auth_util import get_login_user
-from .chatroom import ChatroomStatus, OrderStatus
+
 
 def confirm_chatroom(chatroom_id: str):
-    chatroom = get("chatroom", {"id": chatroom_id})[0]
-    order = get('order', {"id": chatroom.get('order_id')})[0]
+    chatroom = get_chatroom_by_id(chatroom_id)
+    order = get_order_by_id(chatroom.order_id)
 
-    update('chatroom', {
-        "id": chatroom_id
-    }, {
-               "status": ChatroomStatus.CONFIRM.value
-           })
-
-    exc_time = date2str(get_current()) if order.get('exc_time') == "None" else order.get('exc_time')
-    update('order', {
-        "id": order.get('id')
-    }, {
-               "status": OrderStatus.COMPLETED.value
-           })
-
-    undertaker_id = get_other_member(chatroom_id)
-    undertaker = get('account', {"id": undertaker_id})[0]
-
-    update('account',{
-        "id": undertaker.get('id')
-    },{
-        "bocoin" : undertaker.get('bocoin') + order.get('price')
+    update_chatroom_by_id(chatroom_id, {
+        "status": ChatroomStatus.CONFIRM.value
     })
 
-def get_other_member(chatroom_id: str):
-    chatroom_members = get('chatroom_member', {"chatroom_id": chatroom_id})
+    exec_time = get_current_string() if order.exec_time == "None" else order.exec_time
+    update_order_by_id(order.id, {
+        "status": OrderStatus.COMPLETED.value,
+        "exec_time": exec_time
+    })
+
+    undertaker_id = get_other_member_id(chatroom_id)
+    undertaker = get_account_by_id(undertaker_id)
+
+    update_account_by_id(undertaker.id, {
+        "bocoin": undertaker.bocoin + order.price
+    })
+
+
+def get_other_member_id(chatroom_id: str):
+    members = get_chatroom_member_by_id(chatroom_id)
     user = get_login_user()
 
-    for chatroom_member in chatroom_members:
-        member_id = chatroom_member.get('account_id')
+    for member in members:
+        member_id = member.account_id
         if member_id != user.get('id'):
             return member_id

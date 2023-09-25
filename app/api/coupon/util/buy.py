@@ -1,6 +1,6 @@
-from app.database.util import update, get, delete
+from app.database.util import update, get, delete, create
 from app.utils.auth.auth_util import get_login_user
-
+from app.database.model.coupon import create_coupon
 
 def buy(coupon_type_id: str):
     user = get_login_user()
@@ -19,7 +19,4 @@ def buy(coupon_type_id: str):
                "count": coupon_type.get('count') - 1
            })
 
-    if coupon_type.get('count') <= 1:
-        delete('coupon_type', {
-            "id": coupon_type_id
-        })
+    create_coupon(user.get('id'), coupon_type_id)

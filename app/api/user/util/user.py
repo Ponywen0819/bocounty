@@ -1,5 +1,5 @@
 from dataclasses import dataclass, fields
-
+from app.utils.response import missing_required
 
 @dataclass
 class CreateUser:
@@ -19,6 +19,8 @@ class EditUser:
     def __post_init__(self):
         type_checker(self)
 
+        if self.name == self.password == self.intro == None:
+            missing_required()
 
 @dataclass
 class User:

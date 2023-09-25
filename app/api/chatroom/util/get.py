@@ -1,7 +1,10 @@
 from flask import request
 from app.database.util import get
 from app.utils.auth.auth_util import get_login_user
-from .chatroom import Chatroom, ChatroomMember
+from app.database.model.chatroom import Chatroom
+from app.database.model.chatroom_member import ChatroomMember
+# from .chatroom import Chatroom, ChatroomMember
+
 
 
 def get_chatroom_list():

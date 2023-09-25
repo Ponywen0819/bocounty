@@ -5,7 +5,7 @@ from flask import make_response, jsonify
 def conflict():
     raise HTTPException(response=make_response(jsonify({
         "message": "student id conflict"
-    }), 400))
+    }), 409))
 
 
 def missing_required():

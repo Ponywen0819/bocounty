@@ -1,8 +1,9 @@
 from flask import Blueprint
-from app.utils.auth.auth_util import required_login
+from app.utils.auth.auth_util import required_login, get_login_user
 from app.utils.response import success
+from app.database.model.coupon import get_user_coupon_by_account_id
 
-from .util.validate import validate_buy
+from .util.validate import validate_buy, validate_coupon_type_count
 from .util.get import get_own_coupon, get_coupon_type
 from .util.buy import buy
 
@@ -22,7 +23,8 @@ def get_coupon_list_api():
 @coupon_api.route("/own", methods=["GET"])
 @required_login()
 def get_own_coupon_list_api():
-    coupons = get_own_coupon()
+    user = get_login_user()
+    coupons = get_user_coupon_by_account_id(user.get('id'))
 
     return success({
         "data": coupons
@@ -33,6 +35,7 @@ def get_own_coupon_list_api():
 @required_login()
 def buy_coupon(coupon_id: str):
     validate_buy(coupon_id)
+    validate_coupon_type_count(coupon_id)
 
     buy(coupon_id)
 

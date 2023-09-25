@@ -1,6 +1,7 @@
 from app.database.util import get
 from .order import Order
 from app.database.util import get_from_raw
+from app.database.model.order import OrderStatus
 from app.utils.auth.auth_util import get_login_user
 
 
@@ -14,7 +15,7 @@ def get_open_order():
 
     orders = get_from_raw('order', f"""
         SELECT * FROM 'order'
-        WHERE status = 0 AND owner_id != '{user.get('id')}'
+        WHERE status = {OrderStatus.RECRUITING.value} AND owner_id != '{user.get('id')}'
     """)
 
     return [Order(**order) for order in orders]

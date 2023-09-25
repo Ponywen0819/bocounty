@@ -2,8 +2,8 @@ from app.database.util import get
 from .database import get_notification_with_page
 
 from flask import request
-from .notification import Notification
-
+# from .notification import Notification
+from app.database.model.notification import Notification
 
 def get_notification(notification_id: str):
     notification = get('notification', {

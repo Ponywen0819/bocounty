@@ -14,9 +14,9 @@ def missing_required():
     }), 400))
 
 
-def not_found():
+def incorrect():
     raise HTTPException(response=make_response(jsonify({
-        "message": "user no found"
+        "message": "incorrect student id or password"
     }), 401))
 
 

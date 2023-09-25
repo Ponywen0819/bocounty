@@ -19,7 +19,7 @@ def not_member():
 def not_owner():
     raise HTTPException(response=make_response(jsonify({
         "message": "user is not order owner"
-    }), 409))
+    }), 401))
 
 
 def is_owner():

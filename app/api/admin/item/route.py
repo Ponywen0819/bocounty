@@ -14,8 +14,17 @@ from .util.formatter import (
 )
 
 from .util.create import create_item, save_photo
+from app.database.model.item import get_item_list
 
-item_api = Blueprint("admin_item_api", __name__,url_prefix="/item")
+item_api = Blueprint("admin_item_api", __name__, url_prefix="/item")
+
+
+@item_api.route("/", methods=["GET"])
+@required_login(required_admin=True)
+def list_item_api():
+    item_list = get_item_list()
+
+    return success({"data": item_list})
 
 
 @item_api.route("/", methods=["POST"])
@@ -32,5 +41,3 @@ def create_item_api():
     create_item()
 
     return success()
-
-

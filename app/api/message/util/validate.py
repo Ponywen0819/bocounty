@@ -1,5 +1,6 @@
 from flask import request
-from .message import CreateMessage
+# from .message import CreateMessage
+from app.database.model.message import CreateMessage
 from .response import not_valid_member
 from app.utils.auth.auth_util import get_login_user
 from app.utils.response import missing_required, wrong_format, not_found

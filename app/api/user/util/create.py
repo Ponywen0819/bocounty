@@ -15,7 +15,7 @@ def create_user():
         "820c69b5e95b40c5bf121a337a1f1cec",
         "e196fbb8fd934a9cbfd5d968c3dae18a",
         "4d5d21b000bf4a29bdb9c35c00d7da6d",
-        "2acd5f723b4547818b70847c88357412"
+        "d15ca4c26e3b469083e697dd249b75ca"
     ]
 
     for item_id in item_ids:

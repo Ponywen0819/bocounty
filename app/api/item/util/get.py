@@ -15,14 +15,16 @@ def get_user_wearing(student_id: str):
 
     return convert_id2dict(user_wears)
 
+
 def get_user_own():
     user = get_login_user()
 
-    item_list = get('own_item',{
+    item_list = get('own_item', {
         "user_id": user.get('id')
     })
 
     return convert_id2dict(item_list)
+
 
 def convert_id2dict(item_list: list):
     res = []

@@ -2,9 +2,8 @@ from app.database.util import get, get_db
 from app.utils.response import not_found
 from .response import already_exist, not_owner, not_member, is_owner
 from app.utils.auth.auth_util import get_login_user
+from app.database.model.chatroom import ChatroomStatus
 from app.utils.auth.auth_util import get_login_user
-
-from .chatroom import ChatroomStatus
 
 
 def validate_create_payload(order_id: str):
@@ -139,6 +138,15 @@ def validate_is_owner(chatroom_id: str):
 
     if user.get('id') != order.get('owner_id'):
         not_owner()
+
+
+def validate_not_recruiting(chatroom_id: str):
+    chatroom = get('chatroom', {
+        "id": chatroom_id
+    })[0]
+
+    if ChatroomStatus(chatroom.get('status')) != ChatroomStatus.RECRUITING:
+        already_exist("user already been assigned")
 
 
 def validate_not_submit(chatroom_id: str):

@@ -1,13 +1,12 @@
 from dataclasses import dataclass, fields
 
-
 @dataclass
 class CreatePayload:
     title: str
     intro: str
     price: int
     close_time: str
-    exec_time: str = None
+    exec_time: str
 
     def __post_init__(self):
         type_checker(self)

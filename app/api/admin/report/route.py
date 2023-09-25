@@ -30,3 +30,15 @@ def get_report_api(report_id: str):
     return success({
         "data": report
     })
+
+
+@report_api.route("/confirm/<string:report_id>", methods=["POST"])
+@required_login(required_admin=True)
+def confirm_report_api(report_id: str):
+    validate_report_exist(report_id)
+
+    report = get_report(report_id)
+
+    return success({
+        "data": report
+    })

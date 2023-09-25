@@ -10,4 +10,4 @@ def not_login():
 def no_permission():
     raise HTTPException(response=make_response(jsonify({
         "message": "user is not administrator"
-    }), 403))
+    }), 401))

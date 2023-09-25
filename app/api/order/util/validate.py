@@ -18,11 +18,6 @@ def validate_create_payload():
     except ValueError:
         wrong_format()
 
-    _validate_exc_time()
-    _validate_close_time()
-    _validate_close_after_exec()
-    _validate_coin()
-
 
 def validate_get(order_id):
     _validate_order_exist(order_id)
@@ -31,6 +26,7 @@ def validate_get(order_id):
 def validate_delete(order_id):
     _validate_order_exist(order_id)
     _validate_permission(order_id)
+
 
 def _validate_order_exist(order_id: str):
     orders = get("order", {
@@ -41,11 +37,11 @@ def _validate_order_exist(order_id: str):
         not_found()
 
 
-def _validate_exc_time():
+def validate_exc_time():
     payload: dict = request.json
     exec_time = payload.get("exec_time")
 
-    if exec_time is None:
+    if exec_time == "None":
         return
 
     if type(exec_time) != str:
@@ -55,7 +51,7 @@ def _validate_exc_time():
     _validate_date_correct(exec_time)
 
 
-def _validate_close_time():
+def validate_close_time():
     payload: dict = request.json
     close_time = payload.get("close_time")
 
@@ -69,10 +65,10 @@ def _validate_close_time():
     _validate_date_correct(close_time)
 
 
-def _validate_close_after_exec():
+def validate_close_after_exec():
     payload: dict = request.json
     exec_time = payload.get("exec_time")
-    if exec_time is None:
+    if exec_time == "None":
         return
     close_time = payload.get("close_time")
     if str2date(close_time) > str2date(exec_time):
@@ -95,7 +91,7 @@ def _validate_date_correct(value: str):
         date_in_past()
 
 
-def _validate_coin():
+def validate_coin():
     payload: dict = request.json
 
     user = get_login_user()
