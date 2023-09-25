@@ -1,23 +1,34 @@
-from .validate import validate_create_payload_columns, validate_conflict
 from app.database.util import create
-from hashlib import sha256
-from uuid import uuid4
+from app.utils.time_util import get_current, date2str
+from flask import request
 
 
-def create_user(values: dict) -> str:
-    new_id: str = uuid4().hex
-    values['id'] = new_id
-    validate_create_payload_columns(values)
-    validate_conflict(values)
-    create("account", {
-        "id": new_id,
-        "student_id": values["student_id"],
-        "name": "新進冒險者",
-        "password": sha256(values["password"].encode("utf-8")).hexdigest(),
-        "bocoin": 0,
-        "intro": "留下你的自我介紹吧!",
-        "verify": 0,
-        "role": 0
-    })
+def create_user():
+    payload: dict = request.json
+    create("account", payload)
 
-    return new_id
+    user_id = payload.get('id')
+    current_time = date2str(get_current())
+    item_ids = [
+        "6fbd9679bd8b41239f584624af23e74b",
+        "0b7e63b98e0143e980bd3c2c3e815f73",
+        "820c69b5e95b40c5bf121a337a1f1cec",
+        "e196fbb8fd934a9cbfd5d968c3dae18a",
+        "4d5d21b000bf4a29bdb9c35c00d7da6d",
+        "d15ca4c26e3b469083e697dd249b75ca"
+    ]
+
+    for item_id in item_ids:
+        create("own_item", {
+            "user_id":user_id,
+            "item_id":item_id,
+            "time": current_time
+        })
+
+    for item_id in item_ids[:3]:
+        create("picked_item", {
+            "user_id": user_id,
+            "item_id": item_id,
+        })
+
+

@@ -8,9 +8,8 @@ def create(table: str, value: dict):
     cursor = db.cursor()
 
     cursor.execute(f"""
-        INSERT INTO {table} 
+        INSERT INTO '{table}'
         {get_keys_string(value)}
         VALUES {get_values_string(value)}
     """)
 
-    db.commit()

@@ -2,21 +2,11 @@ from flask import Flask
 
 
 def create_app(config_filename=None):
-    main = Flask(__name__, template_folder='./template', static_folder='./src')
+    main = Flask(__name__, template_folder='./template', static_folder='../public', static_url_path="/static")
     if config_filename is None:
         main.config.from_pyfile('config.py')
     else:
         main.config.from_pyfile(config_filename)
-    from app.utils.setting_util import SettingUtil
-    setter = SettingUtil(main.config)
-    main.config["setting"] = setter.load_setting()
-    main.config["verify_code"] = {}
-
-    from app.utils.jwt_util import JWTGenerator
-    main.config['jwt_gen']: JWTGenerator = JWTGenerator()
-
-    from app.database import db, create_db
-    db.init_app(main)
 
     register_blueprints(main)
 
@@ -24,8 +14,34 @@ def create_app(config_filename=None):
 
 
 def register_blueprints(app: Flask):
-    from app.api.user import user_api
-    app.register_blueprint(user_api)
-
     from app.api.auth import auth_api
     app.register_blueprint(auth_api)
+
+    from app.api.user.route import user_api
+    app.register_blueprint(user_api)
+
+    from app.api.order.route import order_api
+    app.register_blueprint(order_api)
+
+    from app.api.report.route import report_api
+    app.register_blueprint(report_api)
+
+    from app.api.chatroom.route import chatroom_api
+    app.register_blueprint(chatroom_api)
+
+    from app.api.message.route import message_api
+    app.register_blueprint(message_api)
+
+    from app.api.item.route import item_api
+    app.register_blueprint(item_api)
+
+    from app.api.coupon.route import coupon_api
+    app.register_blueprint(coupon_api)
+
+    from app.api.notification.route import notification_api
+    app.register_blueprint(notification_api)
+
+    from app.api.admin.route import admin_api
+    app.register_blueprint(admin_api)
+
+

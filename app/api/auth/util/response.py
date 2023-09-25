@@ -1,18 +1,26 @@
-from flask import Response
-from datetime import datetime, timedelta
-from app.utils.jwt_util import JWTGenerator
+from werkzeug.exceptions import HTTPException
+from flask import make_response, jsonify
 
 
-def with_jwt(res: Response, user: dict) -> Response:
-    jwt_util = JWTGenerator()
-    jwt_encode = jwt_util.generate_token({
-        "id": user["id"]
-    })
-    res.set_cookie('user_token', jwt_encode, expires=datetime.now() + timedelta(days=2))
-
-    return res
+def wrong_format():
+    raise HTTPException(response=make_response(jsonify({
+        "message": "wrong format"
+    }), 400))
 
 
-def without_jwt(res: Response) -> Response:
-    res.set_cookie('user_token', "", expires=-1)
-    return res
+def missing_required():
+    raise HTTPException(response=make_response(jsonify({
+        "message": "missing required column"
+    }), 400))
+
+
+def incorrect():
+    raise HTTPException(response=make_response(jsonify({
+        "message": "incorrect student id or password"
+    }), 401))
+
+
+def not_verified():
+    raise HTTPException(response=make_response(jsonify({
+        "message": "user no verified"
+    }), 403))
