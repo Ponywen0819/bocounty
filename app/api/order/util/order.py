@@ -5,6 +5,7 @@ class CreatePayload:
     title: str
     intro: str
     price: int
+    connect_info: str
     close_time: str
     exec_time: str
 
@@ -34,6 +35,7 @@ class Order:
     start_time: str
     close_time: str
     exec_time: str
+    connect_info: str
 
     def __post_init__(self):
         type_checker(self)

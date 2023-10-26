@@ -81,18 +81,18 @@ def assign_chatroom(chatroom_id: str):
     return success()
 
 
-@chatroom_api.route("/submit/<string:chatroom_id>", methods=["POST"])
-@required_login()
-def submit_chatroom_api(chatroom_id: str):
-    validate_chatroom_exist(chatroom_id)
-    validate_is_member(chatroom_id)
-    validate_not_owner(chatroom_id)
-    validate_not_submit(chatroom_id)
-
-    submit_chatroom(chatroom_id)
-    send_submit_message(chatroom_id)
-
-    return success()
+# @chatroom_api.route("/submit/<string:chatroom_id>", methods=["POST"])
+# @required_login()
+# def submit_chatroom_api(chatroom_id: str):
+#     validate_chatroom_exist(chatroom_id)
+#     validate_is_member(chatroom_id)
+#     validate_not_owner(chatroom_id)
+#     validate_not_submit(chatroom_id)
+#
+#     submit_chatroom(chatroom_id)
+#     send_submit_message(chatroom_id)
+#
+#     return success()
 
 
 @chatroom_api.route("/confirm/<string:chatroom_id>", methods=["POST"])

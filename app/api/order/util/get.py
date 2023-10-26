@@ -36,7 +36,9 @@ def get_enrolled_order():
         owner_id=data['owner_id'],
         start_time=data['start_time'],
         close_time=data['close_time'],
-        exec_time=data['exec_time']) for data in orders]
+        exec_time=data['exec_time'],
+        connect_info = data['connect_info']
+    ) for data in orders]
 
 
 def get_order(order_id: str):

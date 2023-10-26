@@ -22,6 +22,7 @@ class Order:
     close_time: str
     exec_time: str
     owner_id: str
+    connect_info: str
 
     def __post_init__(self):
         type_checker(self)
