@@ -82,6 +82,8 @@ def _validate_owner(chatroom_id: str):
         "id": chatroom_list[0].get('order_id')
     })
 
+    print(user.get('id'),chatroom_list[0].get('order_id'))
+
     if len(orders) != 1:
         not_owner()
 
@@ -165,3 +167,15 @@ def validate_not_finish(chatroom_id: str):
 
     if ChatroomStatus(chatroom.get('status')) == ChatroomStatus.CONFIRM:
         already_exist("user already finished")
+
+def validate_order_owner (order_id: str):
+    user = get_login_user()
+
+    orders = get('order', {
+        "id": order_id,
+        "owner_id": user.get('id')
+    })
+
+
+    if len(orders) == 0:
+        not_owner()

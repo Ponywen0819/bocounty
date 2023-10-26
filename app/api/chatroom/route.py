@@ -2,6 +2,7 @@ from flask import Blueprint
 from app.utils.response import success
 from app.database.model.chatroom import (
     get_user_chatroom_list,
+get_order_chatroom_list,
     create_chatroom
 )
 from app.database.model.chatroom_member import (
@@ -21,7 +22,9 @@ from .util.validate import (
     validate_is_member,
     validate_not_submit,
     validate_not_finish,
-    validate_not_recruiting
+    validate_not_recruiting,
+_validate_order_exist,
+validate_order_owner
 )
 
 from .util.initial import initial_member
@@ -55,6 +58,15 @@ def creat_chatroom(order_id):
     initial_member(payload)
 
     return success()
+
+@chatroom_api.route("/<string:order_id>", methods=["GET"])
+@required_login()
+def get_chatroom(order_id):
+    _validate_order_exist(order_id)
+    validate_order_owner(order_id)
+    Chatroom_list = get_order_chatroom_list(order_id)
+
+    return success({ "data": Chatroom_list})
 
 
 @chatroom_api.route("/member/<string:chatroom_id>", methods=["GET"])

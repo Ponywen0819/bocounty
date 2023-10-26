@@ -27,3 +27,11 @@ def get_user_chatroom_list():
         chatroom_list.append(chatroom)
 
     return chatroom_list
+
+
+def get_order_chatroom_list(order_id: str):
+    chatroom_list = get(TABLE, {
+        "order_id": order_id
+    })
+
+    return  [Chatroom(**data) for data in chatroom_list]
