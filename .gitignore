@@ -23,7 +23,7 @@ package-lock.json
 
 test.py
 
-bocountry.sqlite
+#bocountry.sqlite
 
 package.json
 
