@@ -35,7 +35,7 @@ def get_pool_items_api(pool_id: str):
 def draw_api(pool_id: str):
     validate_draw(pool_id)
 
-    item_list = draw_card()
+    item_list = draw_card(pool_id)
 
     return success({
         "data": item_list

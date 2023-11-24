@@ -39,9 +39,15 @@ def change_user_wearing_api():
 @item_api.route("/own")
 @required_login()
 def get_user_own_api():
-
     items = get_user_own()
 
     return success({
         "data": items
     })
+
+@item_api.route("/get", methods=["GET"])
+@required_login()
+def get_new_item():
+    pass
+
+    return success({})

@@ -41,6 +41,9 @@ def register_blueprints(app: Flask):
     from app.api.notification.route import notification_api
     app.register_blueprint(notification_api)
 
+    from  app.api.pool.route import pool_api
+    app.register_blueprint(pool_api)
+
     from app.api.admin.route import admin_api
     app.register_blueprint(admin_api)
 

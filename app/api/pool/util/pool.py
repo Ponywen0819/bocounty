@@ -12,6 +12,8 @@ class Pool:
     id: str
     name: str
     photo: str
+    close_time: str
+    start_time: str
 
 
 @dataclass

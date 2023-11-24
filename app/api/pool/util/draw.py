@@ -11,23 +11,28 @@ from .pool import DrawType
 from .get import get_pool_item
 
 
-def draw_card():
+def draw_card(pool_id:str):
     payload: dict = request.json
 
-    type = DrawType(payload["type"])
+    type = payload["type"]
 
-    item_list = get_pool_item("pool_id")
+    item_list = get_pool_item(pool_id)
 
     num = 0
-    if type == DrawType.single:
+    print(type, DrawType.multi.value)
+    if type == DrawType.single.value:
         num = 1
-    elif type == DrawType.multi:
+    elif type == DrawType.multi.value:
         num = 10
 
     res = []
+    print(item_list)
     for i in range(num):
-        picked = randint(0, len(item_list))
+        picked = 0
+        if len(item_list) >= 1:
+            picked = randint(0, len(item_list) - 1)
         res.append(item_list[picked])
+    print(num, res)
 
     update_item(res)
 
@@ -39,7 +44,7 @@ def update_item(item_list: list[PoolItem]):
     current = date2str(get_current())
 
     for item in item_list:
-        items = get('own_pool', {
+        items = get('own_item', {
             "user_id": user.get('id'),
             "item_id": item.item_id
         })
@@ -47,7 +52,7 @@ def update_item(item_list: list[PoolItem]):
         if len(items) != 0:
             continue
 
-        create('own_pool', {
+        create('own_item', {
             "user_id": user.get('id'),
             "item_id": item.item_id,
             "time": current
